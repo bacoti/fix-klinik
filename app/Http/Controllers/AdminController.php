@@ -2,36 +2,38 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Examination;
 use App\Models\Patient;
-use App\Models\Medicine;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
+    /**
+     * Display admin dashboard with statistics.
+     */
     public function dashboard()
     {
+        $today = Carbon::today();
+
+        // --- Statistics Cards Data ---
         $totalPatients = Patient::count();
-        $verifiedPatients = Patient::where('verified', true)->count();
-        $pendingPatients = Patient::where('verified', false)->count();
-        $totalMedicines = Medicine::count();
+        $totalStaff = User::count(); // Menghitung semua user sebagai staff
+        $todayRegistrations = Patient::whereDate('created_at', $today)->count();
+        $todayExaminations = Examination::whereDate('created_at', $today)->count();
+
+        // --- Recent Activity Data ---
         $recentPatients = Patient::latest()->take(5)->get();
-        
-        // User statistics
-        $totalUsers = \App\Models\User::count();
-        $totalDoctors = \App\Models\User::where('role', 'doctor')->count();
-        $totalNurses = \App\Models\User::where('role', 'nurse')->count();
-        $totalPharmacists = \App\Models\User::where('role', 'pharmacist')->count();
+        $recentStaff = User::latest()->take(5)->get();
 
         return view('admin.dashboard', compact(
             'totalPatients',
-            'verifiedPatients',
-            'pendingPatients',
-            'totalMedicines',
+            'totalStaff',
+            'todayRegistrations',
+            'todayExaminations',
             'recentPatients',
-            'totalUsers',
-            'totalDoctors',
-            'totalNurses',
-            'totalPharmacists'
+            'recentStaff'
         ));
     }
 }

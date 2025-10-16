@@ -1,55 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Klinik</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ config('app.name', 'Laravel') }} - Login</title>
+
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100">
-    <div class="min-h-screen flex flex-col justify-between">
-        <!-- Header -->
-        <header class="bg-blue-600 text-white py-4 shadow-md">
-            <div class="container mx-auto px-6 flex justify-between items-center">
-                <h1 class="text-2xl font-bold">Klinik</h1>
-                <nav>
-                    <a href="/" class="text-white hover:underline mx-2">Home</a>
-                    <a href="#about" class="text-white hover:underline mx-2">About</a>
-                    <a href="#services" class="text-white hover:underline mx-2">Services</a>
-                    <a href="#contact" class="text-white hover:underline mx-2">Contact</a>
-                </nav>
-            </div>
-        </header>
+<body class="font-sans text-gray-900 antialiased">
+    <div class="flex flex-col sm:flex-row min-h-screen bg-gray-100">
 
-        <!-- Main Content -->
-        <main class="flex-grow container mx-auto px-6 py-12">
-            <section class="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Login</h2>
-                <form action="{{ route('login') }}" method="POST" class="space-y-4">
+        <div class="w-full sm:w-1/2 lg:w-2/5 bg-blue-600 text-white p-12 flex flex-col justify-center items-center relative">
+            <div class="absolute top-0 left-0 w-full h-full bg-cover opacity-20" style="background-image: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop');"></div>
+            <div class="relative z-10 text-center">
+                 <a href="/" class="flex items-center justify-center mb-8 space-x-2">
+                    <svg class="h-10 w-auto text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                    </svg>
+                    <span class="text-3xl font-bold">Klinik-Q</span>
+                </a>
+                <h2 class="text-3xl font-bold mb-4">Sistem Terintegrasi untuk Pelayanan Terbaik</h2>
+                <p class="text-blue-200">Akses dashboard Anda untuk mengelola jadwal, pasien, dan rekam medis secara efisien.</p>
+            </div>
+        </div>
+
+        <div class="w-full sm:w-1/2 lg:w-3/5 bg-white flex justify-center items-center p-8 sm:p-12">
+            <div class="w-full max-w-md">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Selamat Datang Kembali!</h2>
+                <p class="text-gray-600 mb-6">Silakan masuk untuk melanjutkan.</p>
+
+                <x-auth-session-status class="mb-4" :status="session('status')" />
+
+                <form method="POST" action="{{ route('login') }}" class="space-y-6">
                     @csrf
-                    <div>
-                        <label for="email" class="block text-gray-700">Email</label>
-                        <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div>
-                        <label for="password" class="block text-gray-700">Password</label>
-                        <input type="password" id="password" name="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <a href="{{ route('password.request') }}" class="text-blue-600 hover:underline text-sm">Forgot Password?</a>
-                        <a href="{{ route('register') }}" class="text-blue-600 hover:underline text-sm">Create Account</a>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Login</button>
-                </form>
-            </section>
-        </main>
 
-        <!-- Footer -->
-        <footer class="bg-gray-800 text-white py-4">
-            <div class="container mx-auto text-center">
-                <p>&copy; 2025 Klinik. All rights reserved.</p>
+                    <div>
+                        <x-input-label for="email" :value="__('Email')" />
+                        <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <x-input-label for="password" :value="__('Password')" />
+                            @if (Route::has('password.request'))
+                                <a class="text-sm text-blue-600 hover:text-blue-800 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                                    {{ __('Lupa password?') }}
+                                </a>
+                            @endif
+                        </div>
+                        <x-text-input id="password" class="block mt-1 w-full"
+                                        type="password"
+                                        name="password"
+                                        required autocomplete="current-password" />
+                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                    </div>
+
+                    <div class="flex items-center">
+                        <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500" name="remember">
+                        <label for="remember_me" class="ml-2 text-sm text-gray-600">{{ __('Ingat saya') }}</label>
+                    </div>
+
+                    <div>
+                        <x-primary-button class="w-full flex justify-center">
+                            {{ __('Log in') }}
+                        </x-primary-button>
+                    </div>
+                </form>
+
+                <p class="mt-8 text-center text-sm text-gray-600">
+                    Belum punya akun staf?
+                    <a href="{{ route('register') }}" class="font-medium text-blue-600 hover:text-blue-800">
+                        Register di sini
+                    </a>
+                </p>
             </div>
-        </footer>
+        </div>
     </div>
 </body>
 </html>

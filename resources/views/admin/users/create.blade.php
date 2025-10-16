@@ -1,90 +1,58 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Add New Staff') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Tambah User')
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <form method="POST" action="{{ route('users.store') }}">
+                        @csrf
 
-@section('content')
-<div class="max-w-2xl mx-auto space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-900">Tambah User Baru</h2>
-        <a href="{{ route('users.index') }}" class="text-gray-600 hover:text-gray-900">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-        </a>
+                        <div>
+                            <label for="name" class="block font-medium text-sm text-gray-700">Name</label>
+                            <input id="name" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm" type="text" name="name" :value="old('name')" required autofocus />
+                        </div>
+
+                        <div class="mt-4">
+                            <label for="email" class="block font-medium text-sm text-gray-700">Email</label>
+                            <input id="email" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm" type="email" name="email" :value="old('email')" required />
+                        </div>
+
+                        <div class="mt-4">
+                            <label for="password" class="block font-medium text-sm text-gray-700">Password</label>
+                            <input id="password" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm" type="password" name="password" required autocomplete="new-password" />
+                        </div>
+
+                        <div class="mt-4">
+                            <label for="password_confirmation" class="block font-medium text-sm text-gray-700">Confirm Password</label>
+                            <input id="password_confirmation" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm" type="password" name="password_confirmation" required />
+                        </div>
+
+                        <div class="mt-4">
+                            <label for="role" class="block font-medium text-sm text-gray-700">Role</label>
+                            <select name="role" id="role" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm">
+                                <option value="admin">Admin</option>
+                                <option value="doctor">Doctor</option>
+                                <option value="nurse">Nurse</option>
+                                <option value="pharmacist">Pharmacist</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center justify-end mt-4">
+                            <a href="{{ route('users.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">
+                                Cancel
+                            </a>
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+                                Create User
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <!-- Form -->
-    <div class="bg-white shadow rounded-lg p-6">
-        <form method="POST" action="{{ route('users.store') }}" class="space-y-6">
-            @csrf
-
-            <!-- Name -->
-            <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('name') border-red-500 @enderror">
-                @error('name')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Email -->
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="email" id="email" value="{{ old('email') }}" required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('email') border-red-500 @enderror">
-                @error('email')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Role -->
-            <div>
-                <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
-                <select name="role" id="role" required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('role') border-red-500 @enderror">
-                    <option value="">Pilih Role</option>
-                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="doctor" {{ old('role') == 'doctor' ? 'selected' : '' }}>Dokter</option>
-                    <option value="nurse" {{ old('role') == 'nurse' ? 'selected' : '' }}>Perawat</option>
-                    <option value="pharmacist" {{ old('role') == 'pharmacist' ? 'selected' : '' }}>Apoteker</option>
-                </select>
-                @error('role')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Password -->
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" name="password" id="password" required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('password') border-red-500 @enderror">
-                <p class="mt-1 text-sm text-gray-500">Minimal 8 karakter</p>
-                @error('password')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Password Confirmation -->
-            <div>
-                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
-                <input type="password" name="password_confirmation" id="password_confirmation" required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- Buttons -->
-            <div class="flex justify-end space-x-3">
-                <a href="{{ route('users.index') }}" 
-                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-200">
-                    Batal
-                </a>
-                <button type="submit" 
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-                    Simpan User
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-@endsection
+</x-app-layout>
