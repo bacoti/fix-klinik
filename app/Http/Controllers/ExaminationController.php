@@ -18,6 +18,10 @@ class ExaminationController extends Controller
         $query = Examination::with(['patient', 'doctor'])
             ->orderBy('created_at', 'desc');
 
+        if (auth()->user()->role === 'doctor') {
+            $query->where('doctor_id', auth()->id());
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->whereHas('patient', function ($q) use ($search) {
@@ -38,7 +42,7 @@ class ExaminationController extends Controller
     public function show(Examination $examination)
     {
         $examination->load(['patient', 'doctor', 'prescriptions.medicine']);
-        
+
         // Get latest screening for this patient
         $latestScreening = Screening::where('patient_id', $examination->patient_id)
             ->where('created_at', '<=', $examination->created_at)
@@ -110,8 +114,10 @@ class ExaminationController extends Controller
 
                 // Update medicine stock
                 $medicine = Medicine::find($medicineData['medicine_id']);
-                $medicine->stock -= $medicineData['quantity'];
-                $medicine->save();
+                if ($medicine) {
+                    $medicine->stock -= $medicineData['quantity'];
+                    $medicine->save();
+                }
             }
         }
 
@@ -133,7 +139,7 @@ class ExaminationController extends Controller
     public function edit(Examination $examination)
     {
         $patient = $examination->patient;
-        
+
         // Get latest screening
         $screening = Screening::where('patient_id', $patient->id)
             ->where('created_at', '<=', $examination->created_at)
@@ -180,7 +186,7 @@ class ExaminationController extends Controller
     public function downloadPdf(Examination $examination)
     {
         $examination->load(['patient', 'doctor', 'prescriptions.medicine']);
-        
+
         $pdf = Pdf::loadView('examination.pdf', compact('examination'));
         return $pdf->download('prescription_' . $examination->patient->name . '.pdf');
     }
