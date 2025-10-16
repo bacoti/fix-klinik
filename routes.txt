@@ -1,0 +1,41 @@
+
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37m/[39m[38;2;108;114;128m ........................................................................... [39m
+  [33mPOST[39m      [37m_ignition/execute-solution[39m[38;2;108;114;128m ignition.executeSolution › Spatie\LaravelIgnition…[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37m_ignition/health-check[39m[38;2;108;114;128m ignition.healthCheck › Spatie\LaravelIgnition › Healt…[39m
+  [33mPOST[39m      [37m_ignition/update-config[39m[38;2;108;114;128m ignition.updateConfig › Spatie\LaravelIgnition › Upd…[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37madmin/dashboard[39m[38;2;108;114;128m ................. admin.dashboard › AdminController@dashboard[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mapi/user[39m[38;2;108;114;128m .................................................................... [39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mconfirm-password[39m[38;2;108;114;128m . password.confirm › Auth\ConfirmablePasswordController@show[39m
+  [33mPOST[39m      [37mconfirm-password[39m[38;2;108;114;128m ................... Auth\ConfirmablePasswordController@store[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mdashboard[39m[38;2;108;114;128m ......................................................... dashboard[39m
+  [33mPOST[39m      [37memail/verification-notification[39m[38;2;108;114;128m verification.send › Auth\EmailVerificationNo…[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mexaminations/[39m[33m{examination}[39m[37m/pdf[39m[38;2;108;114;128m examination.pdf › ExaminationController@downl…[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mforgot-password[39m[38;2;108;114;128m .. password.request › Auth\PasswordResetLinkController@create[39m
+  [33mPOST[39m      [37mforgot-password[39m[38;2;108;114;128m ..... password.email › Auth\PasswordResetLinkController@store[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mlogin[39m[38;2;108;114;128m .................... login › Auth\AuthenticatedSessionController@create[39m
+  [33mPOST[39m      [37mlogin[39m[38;2;108;114;128m ............................. Auth\AuthenticatedSessionController@store[39m
+  [33mPOST[39m      [37mlogout[39m[38;2;108;114;128m ................. logout › Auth\AuthenticatedSessionController@destroy[39m
+  [33mPOST[39m      [37mmedicines/[39m[33m{medicine}[39m[37m/stock[39m[38;2;108;114;128m medicines.updateStock › PharmacyController@update…[39m
+  [33mPUT[39m       [37mpassword[39m[38;2;108;114;128m ................... password.update › Auth\PasswordController@update[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mpatients[39m[38;2;108;114;128m ........................... patients.index › PatientController@index[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mpatients/[39m[33m{patient}[39m[38;2;108;114;128m ................... patients.show › PatientController@show[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mpatients/[39m[33m{patient}[39m[37m/examination[39m[38;2;108;114;128m examination.create › ExaminationController@cr…[39m
+  [33mPOST[39m      [37mpatients/[39m[33m{patient}[39m[37m/examination[39m[38;2;108;114;128m examination.store › ExaminationController@sto…[39m
+  [33mPOST[39m      [37mpatients/[39m[33m{patient}[39m[37m/prescriptions/[39m[33m{prescription}[39m[37m/dispense[39m[38;2;108;114;128m prescriptions.dispe…[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mpatients/[39m[33m{patient}[39m[37m/screening[39m[38;2;108;114;128m .. screening.create › ScreeningController@create[39m
+  [33mPOST[39m      [37mpatients/[39m[33m{patient}[39m[37m/screening[39m[38;2;108;114;128m .... screening.store › ScreeningController@store[39m
+  [33mPOST[39m      [37mpatients/[39m[33m{patient}[39m[37m/verify[39m[38;2;108;114;128m ........ patients.verify › PatientController@verify[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mpharmacy[39m[38;2;108;114;128m .......................... pharmacy.index › PharmacyController@index[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mprofile[39m[38;2;108;114;128m ............................... profile.edit › ProfileController@edit[39m
+  [33mPATCH[39m     [37mprofile[39m[38;2;108;114;128m ........................... profile.update › ProfileController@update[39m
+  [31mDELETE[39m    [37mprofile[39m[38;2;108;114;128m ......................... profile.destroy › ProfileController@destroy[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mregister[39m[38;2;108;114;128m .................... register › Auth\RegisteredUserController@create[39m
+  [33mPOST[39m      [37mregister[39m[38;2;108;114;128m ................................ Auth\RegisteredUserController@store[39m
+  [33mPOST[39m      [37mreset-password[39m[38;2;108;114;128m ............ password.store › Auth\NewPasswordController@store[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mreset-password/[39m[33m{token}[39m[38;2;108;114;128m ... password.reset › Auth\NewPasswordController@create[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37msanctum/csrf-cookie[39m[38;2;108;114;128m sanctum.csrf-cookie › Laravel\Sanctum › CsrfCookieContro…[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mverify-email[39m[38;2;108;114;128m ... verification.notice › Auth\EmailVerificationPromptController[39m
+  [34mGET[39m[38;2;108;114;128m|[39m[38;2;108;114;128mHEAD[39m  [37mverify-email/[39m[33m{id}[39m[37m/[39m[33m{hash}[39m[38;2;108;114;128m ... verification.verify › Auth\VerifyEmailController[39m
+
+                                                                      [34;1mShowing [37] routes[39;22m
+
