@@ -84,6 +84,7 @@ class ExaminationController extends Controller
             'medicines.*.dosage' => 'required_with:medicines|string',
             'medicines.*.frequency' => 'required_with:medicines|string',
             'medicines.*.duration' => 'required_with:medicines|string',
+            'medicines.*.instructions' => 'nullable|string',
         ]);
 
         // Create examination
@@ -110,6 +111,8 @@ class ExaminationController extends Controller
                     'dosage' => $medicineData['dosage'],
                     'frequency' => $medicineData['frequency'],
                     'duration' => $medicineData['duration'],
+                    // instructions is required by DB (non-nullable), set default empty string if not provided
+                    'instructions' => $medicineData['instructions'] ?? '',
                 ]);
 
                 // Update medicine stock

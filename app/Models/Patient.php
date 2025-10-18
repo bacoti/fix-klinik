@@ -29,6 +29,19 @@ class Patient extends Model
         return $this->hasMany(Screening::class);
     }
 
+    /**
+     * Latest screening relation (for eager loading)
+     */
+    public function latestScreening()
+    {
+        // Use latestOfMany if available (Laravel 8.42+), fallback to hasOne ordered
+        if (method_exists($this->hasOne(Screening::class), 'latestOfMany')) {
+            return $this->hasOne(Screening::class)->latestOfMany();
+        }
+
+        return $this->hasOne(Screening::class)->latest();
+    }
+
     public function examinations()
     {
         return $this->hasMany(Examination::class);

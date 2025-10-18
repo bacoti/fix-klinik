@@ -1,165 +1,78 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Edit Screening: {{ $screening->patient->name }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Edit Screening')
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <form method="POST" action="{{ route('screening.update', $screening) }}" class="space-y-8">
+                        @csrf
+                        @method('PUT')
 
-@section('content')
-<div class="max-w-4xl mx-auto space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-900">Edit Screening</h2>
-            <p class="mt-1 text-sm text-gray-600">{{ $screening->patient->name }} ({{ $screening->patient->medical_record_number }})</p>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 border-b pb-3 mb-4">Vital Signs</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div>
+                                    <label for="temperature" class="block text-sm font-medium text-gray-700">Suhu (°C) *</label>
+                                    <input type="number" step="0.1" name="temperature" id="temperature" value="{{ old('temperature', $screening->temperature) }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm @error('temperature') border-red-500 @enderror">
+                                    <x-input-error :messages="$errors->get('temperature')" class="mt-1" />
+                                </div>
+                                <div>
+                                    <label for="weight" class="block text-sm font-medium text-gray-700">Berat (kg) *</label>
+                                    <input type="number" step="0.1" name="weight" id="weight" value="{{ old('weight', $screening->weight) }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm @error('weight') border-red-500 @enderror">
+                                    <x-input-error :messages="$errors->get('weight')" class="mt-1" />
+                                </div>
+                                <div>
+                                    <label for="height" class="block text-sm font-medium text-gray-700">Tinggi (cm) *</label>
+                                    <input type="number" step="0.1" name="height" id="height" value="{{ old('height', $screening->height) }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm @error('height') border-red-500 @enderror">
+                                    <x-input-error :messages="$errors->get('height')" class="mt-1" />
+                                </div>
+                                <div>
+                                    <label for="blood_pressure_systolic" class="block text-sm font-medium text-gray-700">Tekanan Darah (Systolic)</label>
+                                    <input type="number" name="blood_pressure_systolic" id="blood_pressure_systolic" value="{{ old('blood_pressure_systolic', $screening->blood_pressure_systolic) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="blood_pressure_diastolic" class="block text-sm font-medium text-gray-700">Tekanan Darah (Diastolic)</label>
+                                    <input type="number" name="blood_pressure_diastolic" id="blood_pressure_diastolic" value="{{ old('blood_pressure_diastolic', $screening->blood_pressure_diastolic) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="heart_rate" class="block text-sm font-medium text-gray-700">Denyut Nadi (bpm)</label>
+                                    <input type="number" name="heart_rate" id="heart_rate" value="{{ old('heart_rate', $screening->heart_rate) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 border-b pb-3 mb-4">Keluhan & Catatan</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="complaints" class="block text-sm font-medium text-gray-700">Keluhan Pasien *</label>
+                                    <textarea name="complaints" id="complaints" rows="4" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm @error('complaints') border-red-500 @enderror">{{ old('complaints', $screening->complaints) }}</textarea>
+                                    <x-input-error :messages="$errors->get('complaints')" class="mt-1" />
+                                </div>
+                                <div>
+                                    <label for="notes" class="block text-sm font-medium text-gray-700">Catatan Perawat</label>
+                                    <textarea name="notes" id="notes" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ old('notes', $screening->notes) }}</textarea>
+                                    <p class="mt-1 text-xs text-gray-500">Catatan tambahan atau observasi (opsional).</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <a href="{{ route('screening.show', $screening) }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-300">
+                                Batal
+                            </a>
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+                                Update Screening
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <a href="{{ route('screening.show', $screening) }}" class="text-gray-600 hover:text-gray-900">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-        </a>
     </div>
-
-    <!-- Form -->
-    <div class="bg-white shadow rounded-lg p-6">
-        <form method="POST" action="{{ route('screening.update', $screening) }}" class="space-y-6">
-            @csrf
-            @method('PUT')
-
-            <!-- Vital Signs Section -->
-            <div>
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Vital Signs</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="temperature" class="block text-sm font-medium text-gray-700">Suhu Tubuh (°C) *</label>
-                        <input type="number" step="0.1" name="temperature" id="temperature" 
-                               value="{{ old('temperature', $screening->temperature) }}" 
-                               min="30" max="45" required
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('temperature') border-red-500 @enderror">
-                        @error('temperature')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="blood_pressure_systolic" class="block text-sm font-medium text-gray-700">Tekanan Darah Systolic (mmHg)</label>
-                        <input type="number" name="blood_pressure_systolic" id="blood_pressure_systolic" 
-                               value="{{ old('blood_pressure_systolic', $screening->blood_pressure_systolic) }}" 
-                               min="70" max="250"
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('blood_pressure_systolic') border-red-500 @enderror">
-                        @error('blood_pressure_systolic')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="blood_pressure_diastolic" class="block text-sm font-medium text-gray-700">Tekanan Darah Diastolic (mmHg)</label>
-                        <input type="number" name="blood_pressure_diastolic" id="blood_pressure_diastolic" 
-                               value="{{ old('blood_pressure_diastolic', $screening->blood_pressure_diastolic) }}" 
-                               min="40" max="150"
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('blood_pressure_diastolic') border-red-500 @enderror">
-                        @error('blood_pressure_diastolic')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="heart_rate" class="block text-sm font-medium text-gray-700">Denyut Nadi (bpm)</label>
-                        <input type="number" name="heart_rate" id="heart_rate" 
-                               value="{{ old('heart_rate', $screening->heart_rate) }}" 
-                               min="40" max="200"
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('heart_rate') border-red-500 @enderror">
-                        @error('heart_rate')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="respiratory_rate" class="block text-sm font-medium text-gray-700">Respirasi (kali/menit)</label>
-                        <input type="number" name="respiratory_rate" id="respiratory_rate" 
-                               value="{{ old('respiratory_rate', $screening->respiratory_rate) }}" 
-                               min="10" max="60"
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('respiratory_rate') border-red-500 @enderror">
-                        @error('respiratory_rate')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="oxygen_saturation" class="block text-sm font-medium text-gray-700">Saturasi Oksigen (%)</label>
-                        <input type="number" name="oxygen_saturation" id="oxygen_saturation" 
-                               value="{{ old('oxygen_saturation', $screening->oxygen_saturation) }}" 
-                               min="70" max="100"
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('oxygen_saturation') border-red-500 @enderror">
-                        @error('oxygen_saturation')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-
-            <!-- Body Measurements Section -->
-            <div>
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Pengukuran Tubuh</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="weight" class="block text-sm font-medium text-gray-700">Berat Badan (kg) *</label>
-                        <input type="number" step="0.1" name="weight" id="weight" 
-                               value="{{ old('weight', $screening->weight) }}" 
-                               min="1" max="300" required
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('weight') border-red-500 @enderror">
-                        @error('weight')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="height" class="block text-sm font-medium text-gray-700">Tinggi Badan (cm) *</label>
-                        <input type="number" step="0.1" name="height" id="height" 
-                               value="{{ old('height', $screening->height) }}" 
-                               min="50" max="250" required
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('height') border-red-500 @enderror">
-                        @error('height')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-
-            <!-- Complaints Section -->
-            <div>
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Keluhan & Catatan</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label for="complaints" class="block text-sm font-medium text-gray-700">Keluhan Pasien *</label>
-                        <textarea name="complaints" id="complaints" rows="4" required
-                                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('complaints') border-red-500 @enderror">{{ old('complaints', $screening->complaints) }}</textarea>
-                        @error('complaints')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="notes" class="block text-sm font-medium text-gray-700">Catatan Perawat</label>
-                        <textarea name="notes" id="notes" rows="3"
-                                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('notes') border-red-500 @enderror">{{ old('notes', $screening->notes) }}</textarea>
-                        <p class="mt-1 text-sm text-gray-500">Catatan tambahan atau observasi (opsional)</p>
-                        @error('notes')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-
-            <!-- Buttons -->
-            <div class="flex justify-end space-x-3">
-                <a href="{{ route('screening.show', $screening) }}" 
-                   class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-200">
-                    Batal
-                </a>
-                <button type="submit" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-                    Update Screening
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-@endsection
+</x-app-layout>

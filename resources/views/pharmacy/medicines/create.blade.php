@@ -1,25 +1,16 @@
-@extends('layouts.app')
+<x-app-layout>
+    {{-- Mengatur judul halaman menggunakan named slot --}}
+    <x-slot:title>
+        Tambah Obat
+    </x-slot:title>
 
-@section('title', 'Tambah Obat')
-
-@section('content')
-<div class="max-w-2xl mx-auto space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-900">Tambah Obat Baru</h2>
-        <a href="{{ route('pharmacy.index') }}" class="text-gray-600 hover:text-gray-900">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-        </a>
-    </div>
-
-    <!-- Form -->
-    <div class="bg-white shadow rounded-lg p-6">
+    {{-- Konten utama halaman dimasukkan langsung ke dalam slot default --}}
+    <x-form-layout title="Tambah Obat Baru" :backRoute="route('pharmacy.index')">
+        
         <form method="POST" action="{{ route('medicines.store') }}" class="space-y-6">
             @csrf
 
-            <!-- Name -->
+            {{-- Name --}}
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Nama Obat *</label>
                 <input type="text" name="name" id="name" value="{{ old('name') }}" required
@@ -29,7 +20,7 @@
                 @enderror
             </div>
 
-            <!-- Type -->
+            {{-- Type --}}
             <div>
                 <label for="type" class="block text-sm font-medium text-gray-700">Tipe Obat *</label>
                 <select name="type" id="type" required
@@ -47,7 +38,7 @@
                 @enderror
             </div>
 
-            <!-- Unit -->
+            {{-- Unit --}}
             <div>
                 <label for="unit" class="block text-sm font-medium text-gray-700">Satuan *</label>
                 <input type="text" name="unit" id="unit" value="{{ old('unit') }}" required
@@ -58,7 +49,7 @@
                 @enderror
             </div>
 
-            <!-- Stock -->
+            {{-- Stock --}}
             <div>
                 <label for="stock" class="block text-sm font-medium text-gray-700">Stok Awal *</label>
                 <input type="number" name="stock" id="stock" value="{{ old('stock', 0) }}" min="0" required
@@ -68,7 +59,7 @@
                 @enderror
             </div>
 
-            <!-- Price -->
+            {{-- Price --}}
             <div>
                 <label for="price" class="block text-sm font-medium text-gray-700">Harga (Rp) *</label>
                 <input type="number" name="price" id="price" value="{{ old('price', 0) }}" min="0" step="100" required
@@ -78,7 +69,7 @@
                 @enderror
             </div>
 
-            <!-- Description -->
+            {{-- Description --}}
             <div>
                 <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
                 <textarea name="description" id="description" rows="4"
@@ -89,7 +80,7 @@
                 @enderror
             </div>
 
-            <!-- Buttons -->
+            {{-- Buttons --}}
             <div class="flex justify-end space-x-3">
                 <a href="{{ route('pharmacy.index') }}" 
                     class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-200">
@@ -101,6 +92,6 @@
                 </button>
             </div>
         </form>
-    </div>
-</div>
-@endsection
+
+    </x-form-layout>
+</x-app-layout>

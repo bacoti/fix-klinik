@@ -24,7 +24,7 @@
                     </div>
                     <div>
                         <p class="text-gray-500">Phone Number</p>
-                        <p class="font-medium text-gray-900">{{ $patient->phone_number }}</p>
+                        <p class="font-medium text-gray-900">{{ $patient->phone }}</p>
                     </div>
                     <div class="col-span-2">
                         <p class="text-gray-500">Address</p>

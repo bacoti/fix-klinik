@@ -26,7 +26,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Contact</p>
-                            <p class="mt-1 text-sm text-gray-900">{{ $patient->phone_number }}</p>
+                            <p class="mt-1 text-sm text-gray-900">{{ $patient->phone }}</p>
                         </div>
                     </div>
                 </div>

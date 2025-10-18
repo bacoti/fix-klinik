@@ -40,8 +40,8 @@
                             </div>
 
                             <div>
-                                <label for="phone_number" class="block font-medium text-sm text-gray-700">Phone Number</label>
-                                <input type="text" name="phone_number" id="phone_number" value="{{ old('phone_number') }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <label for="phone" class="block font-medium text-sm text-gray-700">Phone Number</label>
+                                <input type="text" name="phone" id="phone" value="{{ old('phone') }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                             </div>
 
                             <div>

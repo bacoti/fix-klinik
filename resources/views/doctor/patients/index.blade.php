@@ -61,7 +61,7 @@
                                         {{ $patient->registration_number }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $patient->phone_number }}</div>
+                                        <div class="text-sm text-gray-900">{{ $patient->phone }}</div>
                                         <div class="text-sm text-gray-500">{{ $patient->email }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
