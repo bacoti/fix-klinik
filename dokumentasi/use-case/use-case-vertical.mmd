@@ -1,0 +1,166 @@
+flowchart TD
+    Start[SISTEM INFORMASI KLINIK]
+    
+    Start --> Actors[4 ROLE PENGGUNA]
+    
+    Actors --> Admin((ADMIN))
+    Actors --> Nurse((NURSE/PERAWAT))
+    Actors --> Doctor((DOKTER))
+    Actors --> Pharmacist((APOTEKER))
+    
+    %% ADMIN FLOW
+    Admin --> AdminAuth[Autentikasi & Profil]
+    AdminAuth --> A1[Login/Logout/Ganti Password]
+    
+    Admin --> AdminPatient[Manajemen Pasien]
+    AdminPatient --> A2[Registrasi/Edit/Hapus Pasien]
+    AdminPatient --> A3[Lihat Riwayat Medis]
+    AdminPatient --> A4[Export Data Pasien]
+    
+    Admin --> AdminQueue[Pendaftaran & Antrian]
+    AdminQueue --> A5[Daftar Kunjungan]
+    AdminQueue --> A6[Kelola Antrian]
+    AdminQueue --> A7[Cetak Kartu Antrian]
+    
+    Admin --> AdminPayment[Pembayaran]
+    AdminPayment --> A8[Lihat/Proses Tagihan]
+    AdminPayment --> A9[Apply Diskon]
+    AdminPayment --> A10[Cetak Kuitansi]
+    
+    Admin --> AdminMaster[Master Data]
+    AdminMaster --> A11[Master Dokter/Perawat]
+    AdminMaster --> A12[Master Tindakan/Ruangan]
+    AdminMaster --> A13[Master Poli/Diagnosis]
+    
+    Admin --> AdminUser[Manajemen User]
+    AdminUser --> A14[Tambah/Edit/Hapus User]
+    AdminUser --> A15[Kelola Role & Permission]
+    
+    Admin --> AdminReport[Laporan]
+    AdminReport --> A16[Laporan Keuangan]
+    AdminReport --> A17[Laporan Kunjungan/Pasien]
+    AdminReport --> A18[Laporan Apotek/Kinerja]
+    
+    Admin --> AdminSetting[Pengaturan Sistem]
+    AdminSetting --> A19[Pengaturan Umum/Tarif]
+    AdminSetting --> A20[Backup/Restore Database]
+    AdminSetting --> A21[Activity Log]
+    
+    %% NURSE FLOW
+    Nurse --> NurseAuth[Autentikasi & Profil]
+    NurseAuth --> N1[Login/Logout/Ganti Password]
+    
+    Nurse --> NursePatient[Manajemen Pasien]
+    NursePatient --> N2[Registrasi Pasien Baru]
+    NursePatient --> N3[Lihat/Edit Data Pasien]
+    NursePatient --> N4[Lihat Riwayat Medis]
+    
+    Nurse --> NurseQueue[Pendaftaran & Antrian]
+    NurseQueue --> N5[Daftar Kunjungan]
+    NurseQueue --> N6[Kelola Antrian]
+    NurseQueue --> N7[Cetak Kartu Antrian]
+    
+    Nurse --> NurseScreening[Pemeriksaan Awal]
+    NurseScreening --> N8[Input Vital Sign]
+    NurseScreening --> N9[Input Anamnesa Awal]
+    NurseScreening --> N10[Input Alergi]
+    NurseScreening --> N11[Upload Hasil Lab]
+    NurseScreening --> N12[Transfer ke Dokter]
+    
+    Nurse --> NurseAction[Tindakan Medis]
+    NurseAction --> N13[Assist Tindakan Medis]
+    NurseAction --> N14[Kelola Ruangan]
+    
+    %% DOCTOR FLOW
+    Doctor --> DoctorAuth[Autentikasi & Profil]
+    DoctorAuth --> D1[Login/Logout/Ganti Password]
+    
+    Doctor --> DoctorPatient[Data Pasien]
+    DoctorPatient --> D2[Lihat Data Pasien]
+    DoctorPatient --> D3[Lihat Riwayat Medis]
+    DoctorPatient --> D4[Lihat Riwayat Pemeriksaan]
+    
+    Doctor --> DoctorQueue[Antrian]
+    DoctorQueue --> D5[Panggil Antrian]
+    DoctorQueue --> D6[Update Status Antrian]
+    DoctorQueue --> D7[Monitor Antrian]
+    
+    Doctor --> DoctorExam[Konsultasi & Pemeriksaan]
+    DoctorExam --> D8[Input Anamnesa Lengkap]
+    DoctorExam --> D9[Input Pemeriksaan Fisik]
+    DoctorExam --> D10[Input Diagnosis]
+    DoctorExam --> D11[Input Tindakan Medis]
+    DoctorExam --> D12[Buat Resep Obat]
+    
+    Doctor --> DoctorCert[Surat Keterangan]
+    DoctorCert --> D13[Buat Surat Sakit]
+    DoctorCert --> D14[Buat Surat Sehat]
+    DoctorCert --> D15[Buat Surat Rujukan]
+    
+    Doctor --> DoctorSchedule[Jadwal Praktek]
+    DoctorSchedule --> D16[Lihat Jadwal Praktek]
+    DoctorSchedule --> D17[Request Perubahan Jadwal]
+    DoctorSchedule --> D18[Set Status Ketersediaan]
+    
+    Doctor --> DoctorReport[Laporan & Statistik]
+    DoctorReport --> D19[Laporan Kunjungan Pribadi]
+    DoctorReport --> D20[Statistik Kinerja Pribadi]
+    
+    %% PHARMACIST FLOW
+    Pharmacist --> PharAuth[Autentikasi & Profil]
+    PharAuth --> P1[Login/Logout/Ganti Password]
+    
+    Pharmacist --> PharPrescription[Proses Resep]
+    PharPrescription --> P2[Lihat Resep Pending]
+    PharPrescription --> P3[Verifikasi Resep]
+    PharPrescription --> P4[Cek Ketersediaan Stok]
+    PharPrescription --> P5[Racik Obat]
+    PharPrescription --> P6[Cetak Label Obat]
+    PharPrescription --> P7[Hitung Total Biaya]
+    
+    Pharmacist --> PharOTC[Penjualan Bebas/OTC]
+    PharOTC --> P8[Transaksi Penjualan OTC]
+    PharOTC --> P9[Hitung Total Pembayaran]
+    PharOTC --> P10[Cetak Struk Penjualan]
+    
+    Pharmacist --> PharStock[Manajemen Stok Obat]
+    PharStock --> P11[Tambah Obat Baru]
+    PharStock --> P12[Input Stok Masuk/Keluar]
+    PharStock --> P13[Stok Opname]
+    PharStock --> P14[Lihat Kartu Stok]
+    PharStock --> P15[Monitor Alert Stok Minimum]
+    PharStock --> P16[Monitor Obat Kadaluarsa]
+    
+    Pharmacist --> PharPurchase[Pembelian Obat]
+    PharPurchase --> P17[Kelola Data Supplier]
+    PharPurchase --> P18[Buat Purchase Order]
+    PharPurchase --> P19[Terima Barang]
+    PharPurchase --> P20[Retur Pembelian]
+    
+    Pharmacist --> PharPayment[Pembayaran]
+    PharPayment --> P21[Lihat Tagihan Obat]
+    PharPayment --> P22[Proses Pembayaran]
+    PharPayment --> P23[Cetak Kuitansi]
+    
+    Pharmacist --> PharReport[Laporan Apotek]
+    PharReport --> P24[Laporan Penjualan Obat]
+    PharReport --> P25[Laporan Stok Obat]
+    PharReport --> P26[Laporan Pembelian]
+    PharReport --> P27[Laporan Laba Apotek]
+    
+    %% Styling
+    classDef actorStyle fill:#FFE5B4,stroke:#FF8C00,stroke-width:4px,font-size:16px
+    classDef moduleStyle fill:#E8F4F8,stroke:#2E86AB,stroke-width:3px,font-size:14px
+    classDef ucStyle fill:#E6F3FF,stroke:#4A90E2,stroke-width:2px
+    classDef startStyle fill:#90EE90,stroke:#228B22,stroke-width:3px,font-size:18px
+    
+    class Start,Actors startStyle
+    class Admin,Nurse,Doctor,Pharmacist actorStyle
+    class AdminAuth,AdminPatient,AdminQueue,AdminPayment,AdminMaster,AdminUser,AdminReport,AdminSetting moduleStyle
+    class NurseAuth,NursePatient,NurseQueue,NurseScreening,NurseAction moduleStyle
+    class DoctorAuth,DoctorPatient,DoctorQueue,DoctorExam,DoctorCert,DoctorSchedule,DoctorReport moduleStyle
+    class PharAuth,PharPrescription,PharOTC,PharStock,PharPurchase,PharPayment,PharReport moduleStyle
+    class A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18,A19,A20,A21 ucStyle
+    class N1,N2,N3,N4,N5,N6,N7,N8,N9,N10,N11,N12,N13,N14 ucStyle
+    class D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11,D12,D13,D14,D15,D16,D17,D18,D19,D20 ucStyle
+    class P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19,P20,P21,P22,P23,P24,P25,P26,P27 ucStyle

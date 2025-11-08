@@ -1,0 +1,33 @@
+%%{init: {'theme':'default'}}%%
+flowchart TD
+    Start([Pasien Datang ke Klinik]) --> CheckStatus{Pasien<br/>Sudah Terdaftar?}
+    
+    CheckStatus -->|Tidak| RegNewPatient[Registrasi Pasien Baru]
+    RegNewPatient --> InputNIK[Input NIK]
+    InputNIK --> ValidateNIK{NIK Valid<br/>& Tidak Duplikat?}
+    ValidateNIK -->|Tidak| InputNIK
+    ValidateNIK -->|Ya| InputDataPasien[Input Data Pasien<br/>Nama, Alamat, Telepon, dll]
+    InputDataPasien --> GenerateRM[Generate Nomor Rekam Medis]
+    GenerateRM --> SavePatient[Simpan Data Pasien]
+    SavePatient --> RegVisit
+    
+    CheckStatus -->|Ya| SearchPatient[Cari Data Pasien]
+    SearchPatient --> RegVisit[Daftar Kunjungan]
+    
+    RegVisit --> SelectDoctor[Pilih Dokter Tujuan]
+    SelectDoctor --> CheckDoctorAvail{Dokter<br/>Tersedia?}
+    CheckDoctorAvail -->|Tidak| SelectDoctor
+    CheckDoctorAvail -->|Ya| InputKeluhan[Input Keluhan Utama]
+    InputKeluhan --> GenerateQueue[Generate Nomor Antrian]
+    GenerateQueue --> SaveVisit[Simpan Data Kunjungan]
+    SaveVisit --> PrintQueue[Cetak Kartu Antrian]
+    PrintQueue --> EndReg([Selesai Pendaftaran])
+    
+    style Start fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style EndReg fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style CheckStatus fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style ValidateNIK fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckDoctorAvail fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style RegNewPatient fill:#E6F3FF,stroke:#4A90E2,stroke-width:2px
+    style SavePatient fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style SaveVisit fill:#98FB98,stroke:#228B22,stroke-width:2px

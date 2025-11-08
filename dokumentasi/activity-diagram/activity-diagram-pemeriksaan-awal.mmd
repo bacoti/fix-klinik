@@ -1,0 +1,85 @@
+%%{init: {'theme':'default'}}%%
+flowchart TD
+    Start([Pasien Tiba dari Pendaftaran]) --> CheckQueue[Cek Nomor Antrian]
+    CheckQueue --> CallPatient[Panggil Pasien]
+    CallPatient --> GreetPatient[Sapa Pasien]
+    GreetPatient --> OpenPatientRecord[Buka Rekam Medis Pasien]
+
+    OpenPatientRecord --> CheckAllergy{Ada Riwayat<br/>Alergi?}
+    CheckAllergy -->|Ya| NoteAllergy[Catat/Review Alergi]
+    NoteAllergy --> StartVitalSign
+    CheckAllergy -->|Tidak| StartVitalSign[Mulai Pengukuran Vital Sign]
+
+    StartVitalSign --> MeasureBloodPressure[Ukur Tekanan Darah<br/>Sistol/Diastol]
+    MeasureBloodPressure --> MeasureTemperature[Ukur Suhu Badan]
+    MeasureTemperature --> MeasurePulse[Ukur Nadi/Denyut Jantung]
+    MeasurePulse --> MeasureRespiration[Ukur Laju Pernapasan]
+    MeasureRespiration --> MeasureWeight[Timbang Berat Badan]
+    MeasureWeight --> MeasureHeight[Ukur Tinggi Badan]
+    MeasureHeight --> CalculateBMI[Sistem Hitung BMI Otomatis]
+
+    CalculateBMI --> CheckVitalNormal{Vital Sign<br/>Normal?}
+    CheckVitalNormal -->|Tidak Normal| MarkUrgent[Tandai sebagai Urgent]
+    MarkUrgent --> NotifyDoctor[Notifikasi Dokter]
+    NotifyDoctor --> InputVitalSign
+
+    CheckVitalNormal -->|Normal| InputVitalSign[Input Data Vital Sign<br/>ke Sistem]
+    InputVitalSign --> SaveVitalSign[Simpan Vital Sign]
+
+    SaveVitalSign --> StartAnamnesa[Mulai Anamnesa Awal]
+    StartAnamnesa --> AskChiefComplaint[Tanya Keluhan Utama Detail]
+    AskChiefComplaint --> InputChiefComplaint[Input Keluhan Utama]
+
+    InputChiefComplaint --> AskCurrentIllness[Tanya Riwayat<br/>Penyakit Sekarang]
+    AskCurrentIllness --> InputCurrentIllness[Input Riwayat<br/>Penyakit Sekarang]
+
+    InputCurrentIllness --> AskPastIllness[Tanya Riwayat<br/>Penyakit Dahulu]
+    AskPastIllness --> InputPastIllness[Input Riwayat<br/>Penyakit Dahulu]
+
+    InputPastIllness --> AskFamilyHistory[Tanya Riwayat<br/>Penyakit Keluarga]
+    AskFamilyHistory --> InputFamilyHistory[Input Riwayat<br/>Penyakit Keluarga]
+
+    InputFamilyHistory --> AskMedicationHistory[Tanya Riwayat<br/>Pengobatan]
+    AskMedicationHistory --> InputMedicationHistory[Input Riwayat<br/>Pengobatan]
+
+    InputMedicationHistory --> AskHabits[Tanya Kebiasaan<br/>Merokok, Alkohol, dll]
+    AskHabits --> InputHabits[Input Kebiasaan]
+
+    InputHabits --> CheckNewAllergy{Ada Alergi<br/>Baru?}
+    CheckNewAllergy -->|Ya| InputAllergy[Input Data Alergi<br/>Obat/Makanan/Lainnya]
+    InputAllergy --> SaveAllergy[Simpan Data Alergi]
+    SaveAllergy --> CheckLabResults
+
+    CheckNewAllergy -->|Tidak| CheckLabResults{Ada Hasil<br/>Lab/Penunjang?}
+
+    CheckLabResults -->|Ya| UploadLabResults[Upload Foto/Scan<br/>Hasil Lab]
+    UploadLabResults --> AttachToRecord[Lampirkan ke<br/>Rekam Medis]
+    AttachToRecord --> InputLabNotes[Input Keterangan<br/>Hasil Lab]
+    InputLabNotes --> SaveAnamnesa
+
+    CheckLabResults -->|Tidak| SaveAnamnesa[Simpan Data Anamnesa]
+
+    SaveAnamnesa --> SelectRoom{Ruangan<br/>Tersedia?}
+    SelectRoom -->|Tidak| WaitRoom[Tunggu Ruangan Kosong]
+    WaitRoom --> SelectRoom
+
+    SelectRoom -->|Ya| AssignRoom[Assign Pasien ke Ruangan]
+    AssignRoom --> UpdateQueueStatus[Update Status Antrian<br/>Siap Diperiksa Dokter]
+
+    UpdateQueueStatus --> NotifyDoctorReady[Kirim Notifikasi ke Dokter]
+    NotifyDoctorReady --> EscortPatient[Antar Pasien ke<br/>Ruang Pemeriksaan]
+    EscortPatient --> InformDoctor[Informasi Dokter<br/>Pasien Sudah Siap]
+    InformDoctor --> End([Selesai Pemeriksaan Awal])
+
+    style Start fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style End fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style CheckAllergy fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckVitalNormal fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckNewAllergy fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckLabResults fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style SelectRoom fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style SaveVitalSign fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style SaveAllergy fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style SaveAnamnesa fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style UpdateQueueStatus fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style MarkUrgent fill:#FF6B6B,stroke:#C92A2A,stroke-width:2px

@@ -1,0 +1,84 @@
+classDiagram
+    %% Simplified Class Diagram - Focus on main relationships
+    
+    class User {
+        +id: int
+        +name: string
+        +email: string
+        +role: enum
+        +screeningsAsNurse()
+        +examinationsAsDoctor()
+        +dispensePrescriptions()
+    }
+
+    class Patient {
+        +id: int
+        +name: string
+        +email: string
+        +phone: string
+        +date_of_birth: date
+        +gender: enum
+        +getAge()
+        +getMedicalRecordNumber()
+    }
+
+    class Screening {
+        +id: int
+        +temperature: decimal
+        +blood_pressure: string
+        +heart_rate: int
+        +weight: decimal
+        +height: decimal
+        +complaints: text
+        +getBmi()
+    }
+
+    class Examination {
+        +id: int
+        +anamnesis: text
+        +diagnosis: text
+        +sick_letter: boolean
+        +sick_days: int
+    }
+
+    class Medicine {
+        +id: int
+        +name: string
+        +type: enum
+        +stock: int
+        +price: decimal
+    }
+
+    class Prescription {
+        +id: int
+        +quantity: int
+        +instructions: text
+        +dispensed_at: datetime
+    }
+
+    class StockLog {
+        +id: int
+        +type: enum
+        +quantity: int
+    }
+
+    class MedicalRecord {
+        +id: int
+        +activity_type: enum
+        +details: json
+        +activity_date: datetime
+    }
+
+    %% Main Relationships
+    User "1" --> "*" Screening : performs as nurse
+    User "1" --> "*" Examination : performs as doctor
+    User "1" --> "*" Prescription : dispenses as pharmacist
+    
+    Patient "1" --> "*" Screening : has
+    Patient "1" --> "*" Examination : has
+    Patient "1" --> "*" MedicalRecord : has
+    
+    Examination "1" --> "*" Prescription : contains
+    
+    Medicine "1" --> "*" Prescription : prescribed in
+    Medicine "1" --> "*" StockLog : tracked by

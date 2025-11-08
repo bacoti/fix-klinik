@@ -1,0 +1,64 @@
+%%{init: {'theme':'default'}}%%
+flowchart TD
+    Pharmacist((APOTEKER))
+    
+    Pharmacist --> Auth[AUTENTIKASI & PROFIL]
+    Auth --> UC1[Login]
+    Auth --> UC2[Logout]
+    Auth --> UC3[Ganti Password]
+    Auth --> UC4[Edit Profil]
+    Auth --> UC5[Lihat Notifikasi]
+    
+    Pharmacist --> Prescription[PROSES RESEP]
+    Prescription --> UC32[Lihat Resep Pending]
+    Prescription --> UC33[Verifikasi Resep]
+    Prescription --> UC34[Cek Ketersediaan Stok]
+    Prescription --> UC35[Racik Obat]
+    Prescription --> UC36[Cetak Label Obat]
+    Prescription --> UC37[Hitung Total Biaya]
+    Prescription --> UC90[Selesaikan Resep]
+    
+    Pharmacist --> OTC[PENJUALAN BEBAS/OTC]
+    OTC --> UC91[Transaksi Penjualan OTC]
+    OTC --> UC92[Input Obat ke Keranjang]
+    OTC --> UC93[Hitung Total Pembayaran]
+    OTC --> UC94[Cetak Struk Penjualan]
+    
+    Pharmacist --> Stock[MANAJEMEN STOK OBAT]
+    Stock --> UC38[Tambah Obat Baru]
+    Stock --> UC39[Input Stok Masuk]
+    Stock --> UC40[Input Stok Keluar]
+    Stock --> UC41[Stok Opname]
+    Stock --> UC42[Lihat Kartu Stok]
+    Stock --> UC43[Monitor Alert Stok Minimum]
+    Stock --> UC44[Monitor Obat Kadaluarsa]
+    Stock --> UC95[Adjustment Stok]
+    
+    Pharmacist --> Purchase[PEMBELIAN OBAT]
+    Purchase --> UC45[Kelola Data Supplier]
+    Purchase --> UC46[Buat Purchase Order]
+    Purchase --> UC47[Terima Barang]
+    Purchase --> UC48[Retur Pembelian]
+    Purchase --> UC96[Tracking Status PO]
+    
+    Pharmacist --> Payment[PEMBAYARAN]
+    Payment --> UC49[Lihat Tagihan Obat]
+    Payment --> UC50[Proses Pembayaran]
+    Payment --> UC52[Cetak Kuitansi]
+    
+    Pharmacist --> Report[LAPORAN APOTEK]
+    Report --> UC68[Laporan Apotek]
+    Report --> UC97[Laporan Penjualan Obat]
+    Report --> UC98[Laporan Stok Obat]
+    Report --> UC99[Laporan Pembelian]
+    Report --> UC100[Laporan Laba Apotek]
+    Report --> UC70[Export Laporan]
+    
+    %% Styling
+    classDef actorStyle fill:#FFE5B4,stroke:#FF8C00,stroke-width:4px,font-size:16px
+    classDef moduleStyle fill:#E8F4F8,stroke:#2E86AB,stroke-width:3px,font-size:14px
+    classDef ucStyle fill:#E6F3FF,stroke:#4A90E2,stroke-width:2px
+    
+    class Pharmacist actorStyle
+    class Auth,Prescription,OTC,Stock,Purchase,Payment,Report moduleStyle
+    class UC1,UC2,UC3,UC4,UC5,UC32,UC33,UC34,UC35,UC36,UC37,UC38,UC39,UC40,UC41,UC42,UC43,UC44,UC45,UC46,UC47,UC48,UC49,UC50,UC52,UC68,UC70,UC90,UC91,UC92,UC93,UC94,UC95,UC96,UC97,UC98,UC99,UC100 ucStyle

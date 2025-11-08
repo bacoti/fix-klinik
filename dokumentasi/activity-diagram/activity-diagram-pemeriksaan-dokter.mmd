@@ -1,0 +1,82 @@
+%%{init: {'theme':'default'}}%%
+flowchart TD
+    Start([Pasien Dipanggil]) --> OpenPatientData[Buka Data Pasien]
+    OpenPatientData --> CheckVitalSign{Vital Sign<br/>Sudah Ada?}
+    
+    CheckVitalSign -->|Tidak| WaitNurse[Tunggu Perawat<br/>Input Vital Sign]
+    WaitNurse --> CheckVitalSign
+    
+    CheckVitalSign -->|Ya| ReviewVitalSign[Review Vital Sign<br/>& Anamnesa Perawat]
+    ReviewVitalSign --> InputAnamnesa[Input Anamnesa Lengkap<br/>& Riwayat Penyakit]
+    InputAnamnesa --> PhysicalExam[Pemeriksaan Fisik]
+    PhysicalExam --> InputPhysicalResult[Input Hasil<br/>Pemeriksaan Fisik]
+    
+    InputPhysicalResult --> NeedLab{Perlu<br/>Pemeriksaan<br/>Penunjang?}
+    NeedLab -->|Ya| OrderLab[Order Lab/Rontgen/EKG]
+    OrderLab --> WaitLabResult{Hasil<br/>Sudah Ada?}
+    WaitLabResult -->|Tidak| WaitLabResult
+    WaitLabResult -->|Ya| ReviewLabResult[Review Hasil Lab]
+    ReviewLabResult --> InputDiagnosis
+    
+    NeedLab -->|Tidak| InputDiagnosis[Input Diagnosis ICD-10]
+    InputDiagnosis --> InputDiagnosisDetail[Input Diagnosis Utama<br/>& Diagnosis Banding]
+    
+    InputDiagnosisDetail --> NeedAction{Perlu<br/>Tindakan<br/>Medis?}
+    NeedAction -->|Ya| SelectAction[Pilih Tindakan Medis]
+    SelectAction --> InputActionDetail[Input Detail Tindakan<br/>& Biaya]
+    InputActionDetail --> SaveAction[Simpan Tindakan]
+    SaveAction --> NeedPrescription
+    
+    NeedAction -->|Tidak| NeedPrescription{Perlu<br/>Resep<br/>Obat?}
+    
+    NeedPrescription -->|Ya| SearchMedicine[Cari Obat]
+    SearchMedicine --> CheckStock{Stok<br/>Tersedia?}
+    CheckStock -->|Tidak| AlternativeMed[Pilih Obat Alternatif]
+    AlternativeMed --> CheckStock
+    
+    CheckStock -->|Ya| InputPrescription[Input Dosis, Frekuensi,<br/>Durasi, Aturan Pakai]
+    InputPrescription --> CheckInteraction{Ada<br/>Interaksi<br/>Obat?}
+    CheckInteraction -->|Ya| ReviewInteraction[Review Interaksi]
+    ReviewInteraction --> ConfirmPrescription{Tetap<br/>Lanjut?}
+    ConfirmPrescription -->|Tidak| SearchMedicine
+    ConfirmPrescription -->|Ya| AddMoreMed
+    
+    CheckInteraction -->|Tidak| AddMoreMed{Tambah<br/>Obat Lain?}
+    AddMoreMed -->|Ya| SearchMedicine
+    AddMoreMed -->|Tidak| SavePrescription[Simpan Resep]
+    SavePrescription --> NeedCertificate
+    
+    NeedPrescription -->|Tidak| NeedCertificate{Perlu<br/>Surat<br/>Keterangan?}
+    
+    NeedCertificate -->|Ya - Sakit| CreateSickLetter[Buat Surat Sakit]
+    CreateSickLetter --> InputRestDays[Input Lama Istirahat]
+    InputRestDays --> PrintCertificate
+    
+    NeedCertificate -->|Ya - Sehat| CreateHealthLetter[Buat Surat Sehat]
+    CreateHealthLetter --> PrintCertificate
+    
+    NeedCertificate -->|Ya - Rujukan| CreateReferral[Buat Surat Rujukan]
+    CreateReferral --> InputReferralDetail[Input Tujuan Rujukan<br/>& Alasan]
+    InputReferralDetail --> PrintCertificate[Cetak Surat]
+    PrintCertificate --> FinishExam
+    
+    NeedCertificate -->|Tidak| FinishExam[Selesai Pemeriksaan]
+    FinishExam --> UpdateQueueStatus[Update Status Antrian<br/>Selesai]
+    UpdateQueueStatus --> SendToPharmacy{Ada<br/>Resep?}
+    
+    SendToPharmacy -->|Ya| NotifyPharmacy[Kirim Notifikasi<br/>ke Apoteker]
+    NotifyPharmacy --> SendToCashier
+    
+    SendToPharmacy -->|Tidak| SendToCashier[Kirim ke Kasir<br/>untuk Pembayaran]
+    SendToCashier --> End([Selesai])
+    
+    style Start fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style End fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style CheckVitalSign fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style NeedLab fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style NeedAction fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style NeedPrescription fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckStock fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckInteraction fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style NeedCertificate fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style SendToPharmacy fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px

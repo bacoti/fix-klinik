@@ -1,0 +1,65 @@
+%%{init: {'theme':'default'}}%%
+flowchart TD
+    Start([Notifikasi Resep Baru]) --> OpenPrescription[Buka Detail Resep]
+    OpenPrescription --> ReviewPrescription[Review Resep Dokter]
+    ReviewPrescription --> CheckPatientData[Cek Data Pasien<br/>& Alergi]
+    
+    CheckPatientData --> VerifyPrescription{Resep<br/>Valid?}
+    VerifyPrescription -->|Tidak| ContactDoctor[Hubungi Dokter<br/>untuk Klarifikasi]
+    ContactDoctor --> DoctorConfirm{Dokter<br/>Konfirmasi?}
+    DoctorConfirm -->|Tidak| RejectPrescription[Tolak Resep]
+    RejectPrescription --> NotifyDoctorReject[Notifikasi Dokter]
+    NotifyDoctorReject --> End([Selesai])
+    
+    DoctorConfirm -->|Ya| UpdatePrescription[Update Resep]
+    UpdatePrescription --> VerifyPrescription
+    
+    VerifyPrescription -->|Ya| LoopMedicine[Untuk Setiap Obat<br/>dalam Resep]
+    LoopMedicine --> CheckStockAvail{Stok<br/>Tersedia?}
+    
+    CheckStockAvail -->|Tidak| CheckAlternative{Ada<br/>Alternatif?}
+    CheckAlternative -->|Ya| ContactDoctorAlt[Hubungi Dokter<br/>untuk Obat Pengganti]
+    ContactDoctorAlt --> DoctorApproveAlt{Dokter<br/>Setuju?}
+    DoctorApproveAlt -->|Tidak| NotifyPatient[Informasi Pasien<br/>Obat Tidak Tersedia]
+    NotifyPatient --> NextMedicine
+    DoctorApproveAlt -->|Ya| ReplaceRMedicine[Ganti dengan<br/>Obat Alternatif]
+    ReplaceRMedicine --> CheckStockAvail
+    
+    CheckAlternative -->|Tidak| NotifyPatient
+    
+    CheckStockAvail -->|Ya| SelectBatch[Pilih Batch Obat<br/>FEFO Method]
+    SelectBatch --> CheckExpiry{Expired<br/>< 3 Bulan?}
+    CheckExpiry -->|Ya| WarningExpiry[Tampilkan Warning]
+    WarningExpiry --> ConfirmExpiry{Tetap<br/>Gunakan?}
+    ConfirmExpiry -->|Tidak| SelectBatch
+    ConfirmExpiry -->|Ya| PrepareMedicine
+    
+    CheckExpiry -->|Tidak| PrepareMedicine[Siapkan/Racik Obat<br/>Sesuai Dosis]
+    PrepareMedicine --> PackMedicine[Kemas Obat]
+    PackMedicine --> PrintLabel[Cetak Label Obat<br/>Nama, Dosis, Aturan Pakai]
+    PrintLabel --> AttachLabel[Tempel Label ke Kemasan]
+    AttachLabel --> NextMedicine{Ada Obat<br/>Selanjutnya?}
+    
+    NextMedicine -->|Ya| LoopMedicine
+    NextMedicine -->|Tidak| CalculateTotal[Hitung Total Biaya Obat]
+    
+    CalculateTotal --> UpdateStock[Update Stok Obat<br/>Otomatis]
+    UpdateStock --> RecordTransaction[Catat Transaksi<br/>Penjualan]
+    RecordTransaction --> PrintEtiket[Cetak Etiket<br/>Aturan Pakai Detail]
+    PrintEtiket --> MarkComplete[Tandai Resep Selesai]
+    MarkComplete --> SendToCashier[Kirim ke Kasir<br/>untuk Pembayaran]
+    SendToCashier --> NotifyPatientReady[Notifikasi Pasien<br/>Obat Siap]
+    NotifyPatientReady --> End
+    
+    style Start fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style End fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style VerifyPrescription fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckStockAvail fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckAlternative fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckExpiry fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style DoctorConfirm fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style DoctorApproveAlt fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style ConfirmExpiry fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style NextMedicine fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style UpdateStock fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style RecordTransaction fill:#98FB98,stroke:#228B22,stroke-width:2px

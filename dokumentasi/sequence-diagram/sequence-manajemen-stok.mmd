@@ -1,0 +1,140 @@
+sequenceDiagram
+    actor Pharmacist
+    participant StockManagementPage
+    participant MedicineController
+    participant Database
+    participant StockLogController
+    participant SuccessPage
+
+    Pharmacist->>StockManagementPage: Buka halaman stok obat
+    StockManagementPage->>Database: GET medicines<br/>(with low stock alert)
+    Database-->>StockManagementPage: List of medicines
+    StockManagementPage-->>Pharmacist: Tampilkan daftar obat<br/>dengan status stok
+    
+    alt Tambah Stok (Stock In)
+        Pharmacist->>StockManagementPage: Pilih "Tambah Stok"
+        Pharmacist->>StockManagementPage: Pilih obat
+        Pharmacist->>StockManagementPage: Input quantity masuk
+        Pharmacist->>StockManagementPage: Input description<br/>(supplier, no. PO, etc.)
+        Pharmacist->>StockManagementPage: Submit
+        
+        StockManagementPage->>MedicineController: POST /medicines/{id}/stock/in
+        MedicineController->>MedicineController: Validasi data
+        
+        alt Validasi Berhasil
+            MedicineController->>Database: BEGIN TRANSACTION
+            
+            MedicineController->>Database: UPDATE medicines<br/>SET stock = stock + quantity
+            Database-->>MedicineController: Stock updated
+            
+            MedicineController->>StockLogController: Create stock log
+            StockLogController->>Database: INSERT stock_logs<br/>(type: in, quantity, description)
+            Database-->>StockLogController: Log created
+            StockLogController-->>MedicineController: Success
+            
+            MedicineController->>Database: COMMIT TRANSACTION
+            Database-->>MedicineController: Transaction committed
+            
+            MedicineController-->>StockManagementPage: Success message
+            StockManagementPage->>SuccessPage: Redirect dengan message
+            SuccessPage-->>Pharmacist: Tampilkan success<br/>"Stok berhasil ditambahkan"
+            
+        else Validasi Gagal
+            MedicineController-->>StockManagementPage: Validation errors
+            StockManagementPage-->>Pharmacist: Tampilkan error
+        end
+        
+    else Kurangi Stok (Stock Out)
+        Pharmacist->>StockManagementPage: Pilih "Kurangi Stok"
+        Pharmacist->>StockManagementPage: Pilih obat
+        Pharmacist->>StockManagementPage: Input quantity keluar
+        Pharmacist->>StockManagementPage: Input reason<br/>(expired, rusak, dll)
+        Pharmacist->>StockManagementPage: Submit
+        
+        StockManagementPage->>MedicineController: POST /medicines/{id}/stock/out
+        MedicineController->>MedicineController: Validasi data
+        
+        alt Validasi Berhasil
+            MedicineController->>Database: BEGIN TRANSACTION
+            
+            MedicineController->>Database: GET medicine stock
+            Database-->>MedicineController: Current stock
+            
+            alt Stock >= Quantity
+                MedicineController->>Database: UPDATE medicines<br/>SET stock = stock - quantity
+                Database-->>MedicineController: Stock updated
+                
+                MedicineController->>StockLogController: Create stock log
+                StockLogController->>Database: INSERT stock_logs<br/>(type: out, quantity, description)
+                Database-->>StockLogController: Log created
+                StockLogController-->>MedicineController: Success
+                
+                MedicineController->>Database: COMMIT TRANSACTION
+                Database-->>MedicineController: Transaction committed
+                
+                MedicineController-->>StockManagementPage: Success message
+                StockManagementPage->>SuccessPage: Redirect dengan message
+                SuccessPage-->>Pharmacist: Tampilkan success<br/>"Stok berhasil dikurangi"
+                
+            else Stock < Quantity
+                MedicineController->>Database: ROLLBACK
+                Database-->>MedicineController: Transaction rolled back
+                MedicineController-->>StockManagementPage: Error: Stok tidak cukup
+                StockManagementPage-->>Pharmacist: Tampilkan error
+            end
+            
+        else Validasi Gagal
+            MedicineController-->>StockManagementPage: Validation errors
+            StockManagementPage-->>Pharmacist: Tampilkan error
+        end
+        
+    else Koreksi Stok (Adjustment)
+        Pharmacist->>StockManagementPage: Pilih "Koreksi Stok"
+        Pharmacist->>StockManagementPage: Pilih obat
+        StockManagementPage->>Database: GET current stock
+        Database-->>StockManagementPage: Current stock: [X]
+        StockManagementPage-->>Pharmacist: Tampilkan stok saat ini
+        
+        Pharmacist->>StockManagementPage: Input stok fisik aktual
+        StockManagementPage->>StockManagementPage: Calculate difference<br/>(actual - current)
+        StockManagementPage-->>Pharmacist: Tampilkan selisih
+        
+        Pharmacist->>StockManagementPage: Input reason (stock opname)
+        Pharmacist->>StockManagementPage: Confirm adjustment
+        
+        StockManagementPage->>MedicineController: POST /medicines/{id}/stock/adjust
+        MedicineController->>MedicineController: Validasi data
+        
+        alt Validasi Berhasil
+            MedicineController->>Database: BEGIN TRANSACTION
+            
+            MedicineController->>Database: UPDATE medicines<br/>SET stock = actual_stock
+            Database-->>MedicineController: Stock updated
+            
+            MedicineController->>StockLogController: Create stock log
+            StockLogController->>Database: INSERT stock_logs<br/>(type: adjustment,<br/>quantity: difference,<br/>description: reason)
+            Database-->>StockLogController: Log created
+            StockLogController-->>MedicineController: Success
+            
+            MedicineController->>Database: COMMIT TRANSACTION
+            Database-->>MedicineController: Transaction committed
+            
+            MedicineController-->>StockManagementPage: Success message
+            StockManagementPage->>SuccessPage: Redirect dengan message
+            SuccessPage-->>Pharmacist: Tampilkan success<br/>"Stok berhasil dikoreksi"
+            
+        else Validasi Gagal
+            MedicineController-->>StockManagementPage: Validation errors
+            StockManagementPage-->>Pharmacist: Tampilkan error
+        end
+    end
+    
+    alt Lihat History Stock
+        Pharmacist->>StockManagementPage: Pilih "Lihat History"
+        Pharmacist->>StockManagementPage: Pilih obat
+        StockManagementPage->>Database: GET stock_logs<br/>WHERE medicine_id = [id]<br/>ORDER BY created_at DESC
+        Database-->>StockManagementPage: List of stock logs
+        StockManagementPage-->>Pharmacist: Tampilkan history:<br/>- Date<br/>- Type (in/out/adjustment)<br/>- Quantity<br/>- Description
+    end
+    
+    Note over Pharmacist,SuccessPage: Stock Log Types:<br/>- in: Pembelian/supplier<br/>- out: Dispensed/rusak/expired<br/>- adjustment: Koreksi stock opname

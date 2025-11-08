@@ -1,0 +1,169 @@
+%%{init: {'theme':'default'}}%%
+flowchart TD
+    Start([Mulai Manajemen Stok]) --> SelectAction{Pilih Aktivitas}
+    
+    %% STOK MASUK FLOW
+    SelectAction -->|Stok Masuk| StockIn[Stok Masuk/Pembelian]
+    StockIn --> SelectSupplier[Pilih Supplier]
+    SelectSupplier --> InputInvoice[Input Nomor Faktur/Invoice]
+    InputInvoice --> InputPurchaseDate[Input Tanggal Pembelian]
+    
+    InputPurchaseDate --> LoopItemsIn[Untuk Setiap Item Obat]
+    LoopItemsIn --> SearchMedicineIn{Obat Sudah<br/>Ada di Master?}
+    
+    SearchMedicineIn -->|Tidak| AddNewMedicine[Tambah Obat Baru]
+    AddNewMedicine --> InputMedicineData[Input Data Obat<br/>Nama, Kategori, Satuan]
+    InputMedicineData --> InputPrices[Input Harga Beli<br/>& Harga Jual]
+    InputPrices --> SaveNewMedicine[Simpan Master Obat]
+    SaveNewMedicine --> InputStockIn
+    
+    SearchMedicineIn -->|Ya| InputStockIn[Input Detail Stok Masuk]
+    InputStockIn --> InputBatch[Input Batch Number]
+    InputBatch --> InputExpiry[Input Tanggal Expired]
+    
+    InputExpiry --> CheckExpiryDate{Expired<br/>< 6 Bulan?}
+    CheckExpiryDate -->|Ya| WarningExpiry[Tampilkan Warning<br/>Expired Terlalu Dekat]
+    WarningExpiry --> ConfirmReceive{Tetap<br/>Terima?}
+    ConfirmReceive -->|Tidak| LoopItemsIn
+    ConfirmReceive -->|Ya| InputQtyIn
+    
+    CheckExpiryDate -->|Tidak| InputQtyIn[Input Jumlah Masuk]
+    InputQtyIn --> InputBuyPrice[Input Harga Beli/Unit]
+    InputBuyPrice --> MoreItemsIn{Ada Item<br/>Lagi?}
+    
+    MoreItemsIn -->|Ya| LoopItemsIn
+    MoreItemsIn -->|Tidak| ReviewStockIn[Review Total Pembelian]
+    ReviewStockIn --> SaveStockIn[Simpan Transaksi Stok Masuk]
+    SaveStockIn --> UpdateStockIn[Update Stok Obat]
+    UpdateStockIn --> RecordLogIn[Catat Log Stok]
+    RecordLogIn --> EndStockIn([Selesai Stok Masuk])
+    
+    %% STOK KELUAR FLOW
+    SelectAction -->|Stok Keluar| StockOut[Stok Keluar Manual]
+    StockOut --> SelectReason[Pilih Alasan Keluar]
+    SelectReason --> ReasonType{Jenis Alasan}
+    
+    ReasonType -->|Rusak| MarkDamaged[Tandai Rusak]
+    MarkDamaged --> InputStockOut
+    
+    ReasonType -->|Kadaluarsa| MarkExpired[Tandai Kadaluarsa]
+    MarkExpired --> InputStockOut
+    
+    ReasonType -->|Hilang| MarkLost[Tandai Hilang]
+    MarkLost --> InputStockOut
+    
+    ReasonType -->|Return| MarkReturn[Tandai Return ke Supplier]
+    MarkReturn --> InputStockOut
+    
+    InputStockOut[Input Stok Keluar]
+    InputStockOut --> LoopItemsOut[Untuk Setiap Obat]
+    LoopItemsOut --> SelectMedicineOut[Pilih Obat]
+    SelectMedicineOut --> SelectBatchOut[Pilih Batch]
+    SelectBatchOut --> InputQtyOut[Input Jumlah Keluar]
+    InputQtyOut --> CheckStockAvail{Stok<br/>Cukup?}
+    
+    CheckStockAvail -->|Tidak| ErrorStock[Error: Stok Tidak Cukup]
+    ErrorStock --> LoopItemsOut
+    
+    CheckStockAvail -->|Ya| InputReasonDetail[Input Keterangan Detail]
+    InputReasonDetail --> MoreItemsOut{Ada Obat<br/>Lagi?}
+    
+    MoreItemsOut -->|Ya| LoopItemsOut
+    MoreItemsOut -->|Tidak| NeedApproval{Perlu<br/>Approval?}
+    
+    NeedApproval -->|Ya| RequestApprovalOut[Request Approval Supervisor]
+    RequestApprovalOut --> WaitApprovalOut{Disetujui?}
+    WaitApprovalOut -->|Tidak| CancelStockOut[Batalkan Stok Keluar]
+    CancelStockOut --> EndStockOut
+    WaitApprovalOut -->|Ya| SaveStockOut
+    
+    NeedApproval -->|Tidak| SaveStockOut[Simpan Transaksi Stok Keluar]
+    SaveStockOut --> UpdateStockOut[Update Stok Obat]
+    UpdateStockOut --> RecordLogOut[Catat Log Stok]
+    RecordLogOut --> EndStockOut([Selesai Stok Keluar])
+    
+    %% STOK OPNAME FLOW
+    SelectAction -->|Stok Opname| StockOpname[Mulai Stok Opname]
+    StockOpname --> GenerateOpnameList[Generate List Semua Obat<br/>dengan Stok Sistem]
+    GenerateOpnameList --> PrintOpnameList[Cetak/Download<br/>Form Stok Opname]
+    
+    PrintOpnameList --> LoopCountItems[Hitung Fisik Obat<br/>Satu per Satu]
+    LoopCountItems --> CountPhysical[Hitung Stok Fisik]
+    CountPhysical --> InputPhysicalStock[Input Stok Fisik ke Sistem]
+    InputPhysicalStock --> CalculateDiff[Sistem Hitung Selisih<br/>Fisik vs Sistem]
+    
+    CalculateDiff --> CheckDiff{Ada<br/>Selisih?}
+    CheckDiff -->|Ya| InputDiffReason[Input Keterangan Selisih]
+    InputDiffReason --> MoreItemsCount
+    
+    CheckDiff -->|Tidak| MoreItemsCount{Ada Obat<br/>Lagi?}
+    MoreItemsCount -->|Ya| LoopCountItems
+    MoreItemsCount -->|Tidak| ReviewOpname[Review Hasil Stok Opname]
+    
+    ReviewOpname --> CheckLargeDiff{Selisih<br/>Besar?}
+    CheckLargeDiff -->|Ya| ApprovalOpname[Approval Supervisor]
+    ApprovalOpname --> ApprovedOpname{Disetujui?}
+    ApprovedOpname -->|Tidak| ReCountStock[Hitung Ulang]
+    ReCountStock --> LoopCountItems
+    ApprovedOpname -->|Ya| AdjustStock
+    
+    CheckLargeDiff -->|Tidak| AdjustStock[Adjustment Stok<br/>Sesuai Fisik]
+    AdjustStock --> UpdateStockOpname[Update Stok di Sistem]
+    UpdateStockOpname --> GenerateOpnameReport[Generate Laporan<br/>Stok Opname]
+    GenerateOpnameReport --> PrintOpnameReport[Cetak Laporan]
+    PrintOpnameReport --> ArchiveOpname[Arsip Dokumen<br/>Stok Opname]
+    ArchiveOpname --> EndOpname([Selesai Stok Opname])
+    
+    %% MONITORING STOK
+    SelectAction -->|Monitoring| MonitorStock[Monitoring Stok]
+    MonitorStock --> ViewAllStock[Lihat Semua Stok Obat]
+    ViewAllStock --> CheckMinStock[Cek Stok Minimum]
+    CheckMinStock --> AlertLowStock{Ada Stok<br/>Menipis?}
+    
+    AlertLowStock -->|Ya| DisplayLowStock[Tampilkan Alert<br/>Stok Menipis]
+    DisplayLowStock --> GeneratePOSuggestion[Generate Saran<br/>Purchase Order]
+    GeneratePOSuggestion --> CheckExpiringSoon
+    
+    AlertLowStock -->|Tidak| CheckExpiringSoon[Cek Obat Hampir Expired]
+    CheckExpiringSoon --> AlertExpiring{Ada Obat<br/>Hampir/Sudah<br/>Expired?}
+    
+    AlertExpiring -->|Ya| DisplayExpiring[Tampilkan Alert<br/>Obat Kadaluarsa]
+    DisplayExpiring --> MarkForRemoval[Tandai untuk Dikeluarkan]
+    MarkForRemoval --> EndMonitor
+    
+    AlertExpiring -->|Tidak| EndMonitor([Selesai Monitoring])
+    
+    style Start fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style EndStockIn fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style EndStockOut fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style EndOpname fill:#90EE90,stroke:#228B22,stroke-width:3px
+    style EndMonitor fill:#90EE90,stroke:#228B22,stroke-width:3px
+    
+    style SelectAction fill:#E8F4F8,stroke:#2E86AB,stroke-width:3px
+    style ReasonType fill:#E8F4F8,stroke:#2E86AB,stroke-width:3px
+    
+    style SearchMedicineIn fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckExpiryDate fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style ConfirmReceive fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style MoreItemsIn fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckStockAvail fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style MoreItemsOut fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style NeedApproval fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style WaitApprovalOut fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckDiff fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style MoreItemsCount fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style CheckLargeDiff fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style ApprovedOpname fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style AlertLowStock fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    style AlertExpiring fill:#FFE5B4,stroke:#FF8C00,stroke-width:2px
+    
+    style UpdateStockIn fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style UpdateStockOut fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style UpdateStockOpname fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style SaveStockIn fill:#98FB98,stroke:#228B22,stroke-width:2px
+    style SaveStockOut fill:#98FB98,stroke:#228B22,stroke-width:2px
+    
+    style WarningExpiry fill:#FF6B6B,stroke:#C92A2A,stroke-width:2px
+    style ErrorStock fill:#FF6B6B,stroke:#C92A2A,stroke-width:2px
+    style DisplayLowStock fill:#FF6B6B,stroke:#C92A2A,stroke-width:2px
+    style DisplayExpiring fill:#FF6B6B,stroke:#C92A2A,stroke-width:2px

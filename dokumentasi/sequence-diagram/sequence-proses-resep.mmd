@@ -1,0 +1,112 @@
+sequenceDiagram
+    actor Pharmacist
+    participant PrescriptionQueuePage
+    participant PrescriptionDetailPage
+    participant PharmacyController
+    participant Database
+    participant MedicalRecordController
+    participant PrintPage
+
+    Pharmacist->>PrescriptionQueuePage: Lihat antrian resep
+    PrescriptionQueuePage->>Database: GET examinations<br/>with prescriptions<br/>(not dispensed)
+    Database-->>PrescriptionQueuePage: List of examinations + prescriptions
+    PrescriptionQueuePage-->>Pharmacist: Tampilkan antrian resep
+    
+    Pharmacist->>PrescriptionQueuePage: Pilih pasien untuk<br/>proses resep
+    PrescriptionQueuePage->>PrescriptionDetailPage: Redirect ke detail resep
+    
+    PrescriptionDetailPage->>Database: GET examination data
+    Database-->>PrescriptionDetailPage: Examination details
+    
+    PrescriptionDetailPage->>Database: GET patient data
+    Database-->>PrescriptionDetailPage: Patient details
+    
+    PrescriptionDetailPage->>Database: GET prescriptions<br/>by examination_id
+    Database-->>PrescriptionDetailPage: List of prescriptions<br/>with medicine details
+    
+    PrescriptionDetailPage-->>Pharmacist: Tampilkan detail resep:<br/>- Patient info<br/>- Diagnosis<br/>- List obat + quantity + instructions
+    
+    loop Untuk setiap obat dalam resep
+        Pharmacist->>PrescriptionDetailPage: Check stock availability
+        PrescriptionDetailPage->>Database: GET medicine stock
+        Database-->>PrescriptionDetailPage: Current stock
+        
+        alt Stock Cukup
+            PrescriptionDetailPage-->>Pharmacist: Stock available: [quantity]
+            Pharmacist->>PrescriptionDetailPage: Siapkan obat
+        else Stock Tidak Cukup
+            PrescriptionDetailPage-->>Pharmacist: Stock tidak cukup!<br/>Tersedia: [current] | Butuh: [needed]
+            
+            alt Pharmacist beli/adjust stock
+                Pharmacist->>PrescriptionDetailPage: Buka stock management
+                Note over Pharmacist,Database: Lihat sequence-diagram-manajemen-stok.mmd
+            else Pharmacist skip obat ini
+                Pharmacist->>PrescriptionDetailPage: Tandai obat tidak tersedia
+            end
+        end
+    end
+    
+    Pharmacist->>PrescriptionDetailPage: Confirm semua obat siap
+    Pharmacist->>PrescriptionDetailPage: Submit dispensing
+    
+    PrescriptionDetailPage->>PharmacyController: POST /prescriptions/dispense
+    PharmacyController->>PharmacyController: Validasi data
+    
+    alt Validasi Berhasil
+        PharmacyController->>Database: BEGIN TRANSACTION
+        
+        loop Untuk setiap obat yang di-dispense
+            PharmacyController->>Database: Check medicine stock (with lock)
+            Database-->>PharmacyController: Current stock
+            
+            alt Stock >= Quantity
+                PharmacyController->>Database: UPDATE prescription<br/>SET dispensed_at = NOW()<br/>SET dispensed_by = pharmacist_id
+                Database-->>PharmacyController: Prescription updated
+                
+                PharmacyController->>Database: UPDATE medicine<br/>SET stock = stock - quantity
+                Database-->>PharmacyController: Stock updated
+                
+                PharmacyController->>Database: INSERT stock_log<br/>(type: out, quantity, description)
+                Database-->>PharmacyController: Log created
+                
+            else Stock < Quantity
+                PharmacyController->>Database: ROLLBACK
+                Database-->>PharmacyController: Transaction rolled back
+                PharmacyController-->>PrescriptionDetailPage: Error: Stock tidak cukup untuk [obat]
+                PrescriptionDetailPage-->>Pharmacist: Tampilkan error
+            end
+        end
+        
+        alt Semua berhasil di-dispense
+            PharmacyController->>MedicalRecordController: Create medical record entry
+            MedicalRecordController->>Database: INSERT medical_records<br/>(activity_type: prescription,<br/>details: JSON)
+            Database-->>MedicalRecordController: Record created
+            MedicalRecordController-->>PharmacyController: Success
+            
+            PharmacyController->>Database: COMMIT TRANSACTION
+            Database-->>PharmacyController: Transaction committed
+            
+            PharmacyController-->>PrescriptionDetailPage: Success message
+            PrescriptionDetailPage->>PrintPage: Redirect ke print label
+            
+            PrintPage->>Database: GET prescription details<br/>for printing
+            Database-->>PrintPage: Prescription data
+            
+            PrintPage-->>Pharmacist: Tampilkan print preview:<br/>- Label obat<br/>- Instruksi penggunaan<br/>- Patient info
+            
+            Pharmacist->>PrintPage: Print labels
+            PrintPage-->>Pharmacist: Labels printed
+            
+        else Ada error di tengah proses
+            PharmacyController->>Database: ROLLBACK
+            Database-->>PharmacyController: Transaction rolled back
+            PharmacyController-->>PrescriptionDetailPage: Error message
+            PrescriptionDetailPage-->>Pharmacist: Tampilkan error
+        end
+        
+    else Validasi Gagal
+        PharmacyController-->>PrescriptionDetailPage: Validation errors
+        PrescriptionDetailPage-->>Pharmacist: Tampilkan error messages
+    end
+    
+    Note over Pharmacist,PrintPage: Transaksi Database:<br/>- Atomic operation (all or nothing)<br/>- Stock locking untuk concurrency<br/>- Auto rollback jika error

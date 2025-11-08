@@ -1,0 +1,190 @@
+---
+title: Fix Klinik - Entity Relationship Diagram
+---
+erDiagram
+    %% ========================================
+    %% USERS & AUTHENTICATION
+    %% ========================================
+    users {
+        bigint id PK
+        string name
+        string email UK "unique"
+        timestamp email_verified_at
+        string password
+        string remember_token
+        enum role "admin, nurse, doctor, pharmacist"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    password_reset_tokens {
+        string email PK
+        string token
+        timestamp created_at
+    }
+
+    personal_access_tokens {
+        bigint id PK
+        string tokenable_type
+        bigint tokenable_id
+        string name
+        string token UK "unique, hashed"
+        text abilities
+        timestamp last_used_at
+        timestamp expires_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    failed_jobs {
+        bigint id PK
+        string uuid UK "unique"
+        text connection
+        text queue
+        longtext payload
+        longtext exception
+        timestamp failed_at
+    }
+
+    %% ========================================
+    %% PATIENT MANAGEMENT
+    %% ========================================
+    patients {
+        bigint id PK
+        string name
+        string email UK "unique"
+        string phone
+        text address
+        date date_of_birth
+        enum gender "male, female"
+        boolean verified "default: false"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ========================================
+    %% SCREENING & VITAL SIGNS
+    %% ========================================
+    screenings {
+        bigint id PK
+        bigint patient_id FK
+        bigint nurse_id FK "users.id"
+        decimal temperature "4,1"
+        int blood_pressure_systolic
+        int blood_pressure_diastolic
+        int heart_rate
+        int respiratory_rate
+        int oxygen_saturation
+        decimal weight "5,2"
+        decimal height "5,2"
+        text complaints
+        text notes
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ========================================
+    %% EXAMINATION & DIAGNOSIS
+    %% ========================================
+    examinations {
+        bigint id PK
+        bigint patient_id FK
+        bigint doctor_id FK "users.id"
+        text anamnesis
+        text physical_examination
+        text diagnosis
+        text prescription_text
+        text additional_notes
+        boolean sick_letter "default: false"
+        int sick_days
+        date follow_up_date
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ========================================
+    %% MEDICINE INVENTORY
+    %% ========================================
+    medicines {
+        bigint id PK
+        string name
+        string type "tablet, capsule, syrup, injection, cream, ointment"
+        string unit "strip, bottle, tube, etc"
+        string description
+        int stock
+        decimal price "10,2"
+        timestamp expired_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ========================================
+    %% PRESCRIPTION & DISPENSING
+    %% ========================================
+    prescriptions {
+        bigint id PK
+        bigint examination_id FK
+        bigint medicine_id FK
+        int quantity
+        text instructions
+        timestamp dispensed_at
+        bigint dispensed_by FK "users.id"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ========================================
+    %% STOCK MANAGEMENT
+    %% ========================================
+    stock_logs {
+        bigint id PK
+        bigint medicine_id FK
+        enum type "in, out, adjustment"
+        int quantity
+        text description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ========================================
+    %% MEDICAL RECORDS
+    %% ========================================
+    medical_records {
+        bigint id PK
+        bigint patient_id FK
+        string activity_type "registration, screening, examination, prescription"
+        json details
+        timestamp activity_date
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ========================================
+    %% RELATIONSHIPS
+    %% ========================================
+    
+    %% User Relationships
+    users ||--o{ screenings : "nurse performs"
+    users ||--o{ examinations : "doctor performs"
+    users ||--o{ prescriptions : "pharmacist dispenses"
+
+    %% Patient Relationships
+    patients ||--o{ screenings : "has"
+    patients ||--o{ examinations : "has"
+    patients ||--o{ medical_records : "has"
+
+    %% Screening to Examination
+    screenings ||--o| examinations : "leads to"
+
+    %% Examination to Prescription
+    examinations ||--o{ prescriptions : "contains"
+
+    %% Medicine Relationships
+    medicines ||--o{ prescriptions : "prescribed in"
+    medicines ||--o{ stock_logs : "tracked by"
+
+    %% Medical Records (aggregation)
+    screenings ||--o| medical_records : "logged as"
+    examinations ||--o| medical_records : "logged as"
+    prescriptions ||--o| medical_records : "logged as"
+

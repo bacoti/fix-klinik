@@ -1,0 +1,64 @@
+sequenceDiagram
+    actor Nurse
+    participant PatientListPage
+    participant ScreeningPage
+    participant ScreeningController
+    participant Database
+    participant MedicalRecordController
+    participant QueuePage
+
+    Nurse->>PatientListPage: Lihat daftar pasien hari ini
+    PatientListPage->>Database: GET patients (today)
+    Database-->>PatientListPage: List of patients
+    PatientListPage-->>Nurse: Tampilkan daftar pasien
+    
+    Nurse->>PatientListPage: Pilih pasien untuk screening
+    PatientListPage->>ScreeningPage: Redirect ke form screening
+    ScreeningPage->>Database: GET patient data by ID
+    Database-->>ScreeningPage: Patient details
+    ScreeningPage-->>Nurse: Tampilkan form screening<br/>dengan data pasien
+    
+    Nurse->>ScreeningPage: Input vital signs:<br/>- Temperature<br/>- Blood Pressure (sys/dia)<br/>- Heart Rate<br/>- Respiratory Rate<br/>- Oxygen Saturation
+    
+    Nurse->>ScreeningPage: Input anthropometry:<br/>- Weight<br/>- Height
+    
+    Nurse->>ScreeningPage: Input keluhan utama<br/>dan notes
+    
+    ScreeningPage->>ScreeningPage: Calculate BMI<br/>(weight / height²)
+    ScreeningPage->>ScreeningPage: Determine BMI category
+    ScreeningPage-->>Nurse: Tampilkan BMI & kategori
+    
+    Nurse->>ScreeningPage: Submit screening data
+    ScreeningPage->>ScreeningController: POST /screenings
+    
+    ScreeningController->>ScreeningController: Validasi data
+    
+    alt Validasi Berhasil
+        ScreeningController->>Database: Check existing screening today
+        
+        alt Belum Ada Screening Hari Ini
+            Database-->>ScreeningController: No screening today
+            ScreeningController->>Database: INSERT screening data<br/>(patient_id, nurse_id,<br/>vital signs, anthropometry)
+            Database-->>ScreeningController: Screening created (ID)
+            
+            ScreeningController->>MedicalRecordController: Create medical record entry
+            MedicalRecordController->>Database: INSERT medical_records<br/>(activity_type: screening,<br/>details: JSON)
+            Database-->>MedicalRecordController: Record created
+            MedicalRecordController-->>ScreeningController: Success
+            
+            ScreeningController-->>ScreeningPage: Success message
+            ScreeningPage->>QueuePage: Redirect ke queue dokter
+            QueuePage-->>Nurse: Tampilkan success<br/>"Pasien sudah masuk antrian dokter"
+            
+        else Sudah Ada Screening Hari Ini
+            Database-->>ScreeningController: Screening exists today
+            ScreeningController-->>ScreeningPage: Error: Sudah screening hari ini
+            ScreeningPage-->>Nurse: Tampilkan error message
+        end
+        
+    else Validasi Gagal
+        ScreeningController-->>ScreeningPage: Validation errors
+        ScreeningPage-->>Nurse: Tampilkan error messages
+    end
+    
+    Note over Nurse,QueuePage: BMI Categories:<br/>< 18.5: Underweight<br/>18.5-24.9: Normal<br/>25-29.9: Overweight<br/>≥ 30: Obese

@@ -1,0 +1,80 @@
+---
+title: Fix Klinik - Database Relationship Overview
+---
+flowchart TB
+    %% ========================================
+    %% MAIN ENTITIES
+    %% ========================================
+    
+    subgraph AUTH["🔐 Authentication & Users"]
+        users[("👤 USERS<br/>---<br/>id, name, email<br/>password, role")]
+        tokens[("🔑 TOKENS<br/>---<br/>API & Password Reset")]
+    end
+
+    subgraph PATIENT["👥 Patient Management"]
+        patients[("🏥 PATIENTS<br/>---<br/>id, name, email<br/>phone, address<br/>dob, gender")]
+        records[("📋 MEDICAL RECORDS<br/>---<br/>Activity Log<br/>Timeline")]
+    end
+
+    subgraph CLINICAL["⚕️ Clinical Workflow"]
+        screenings[("🩺 SCREENINGS<br/>---<br/>Vital Signs<br/>Nurse")]
+        examinations[("👨‍⚕️ EXAMINATIONS<br/>---<br/>Diagnosis<br/>Doctor")]
+        prescriptions[("💊 PRESCRIPTIONS<br/>---<br/>Medicine Details<br/>Pharmacist")]
+    end
+
+    subgraph INVENTORY["📦 Inventory Management"]
+        medicines[("💉 MEDICINES<br/>---<br/>id, name, type<br/>stock, price<br/>expired_at")]
+        stock_logs[("📊 STOCK LOGS<br/>---<br/>in/out/adjustment<br/>History")]
+    end
+
+    %% ========================================
+    %% RELATIONSHIPS
+    %% ========================================
+    
+    %% User to Clinical
+    users -->|"nurse_id<br/>performs"| screenings
+    users -->|"doctor_id<br/>diagnoses"| examinations
+    users -->|"dispensed_by<br/>dispenses"| prescriptions
+
+    %% Patient to Clinical
+    patients -->|"patient_id<br/>has screening"| screenings
+    patients -->|"patient_id<br/>has examination"| examinations
+    patients -->|"patient_id<br/>has records"| records
+
+    %% Clinical Flow
+    screenings -.->|"leads to"| examinations
+    examinations -->|"examination_id<br/>contains"| prescriptions
+
+    %% Inventory
+    medicines -->|"medicine_id<br/>prescribed"| prescriptions
+    medicines -->|"medicine_id<br/>tracked"| stock_logs
+
+    %% Medical Records
+    screenings -.->|"logged"| records
+    examinations -.->|"logged"| records
+    prescriptions -.->|"logged"| records
+
+    %% ========================================
+    %% STYLING
+    %% ========================================
+    
+    classDef userStyle fill:#E3F2FD,stroke:#1976D2,stroke-width:2px,color:#000
+    classDef patientStyle fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px,color:#000
+    classDef clinicalStyle fill:#E8F5E9,stroke:#388E3C,stroke-width:2px,color:#000
+    classDef inventoryStyle fill:#FFF3E0,stroke:#F57C00,stroke-width:2px,color:#000
+
+    class users,tokens userStyle
+    class patients,records patientStyle
+    class screenings,examinations,prescriptions clinicalStyle
+    class medicines,stock_logs inventoryStyle
+
+    %% ========================================
+    %% NOTES
+    %% ========================================
+    
+    note1["📌 WORKFLOW:<br/>1. Patient Registration<br/>2. Screening (Nurse)<br/>3. Examination (Doctor)<br/>4. Prescription<br/>5. Medicine Dispensing"]
+    
+    note2["📌 KEY RELATIONSHIPS:<br/>→ Solid: Direct FK<br/>-.-> Dotted: Indirect/Log"]
+
+    style note1 fill:#FFFDE7,stroke:#F57F17,stroke-width:2px
+    style note2 fill:#FFFDE7,stroke:#F57F17,stroke-width:2px

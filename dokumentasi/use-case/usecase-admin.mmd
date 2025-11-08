@@ -1,0 +1,73 @@
+%%{init: {'theme':'default'}}%%
+flowchart TD
+    Admin((ADMIN))
+    
+    Admin --> Auth[AUTENTIKASI & PROFIL]
+    Auth --> UC1[Login]
+    Auth --> UC2[Logout]
+    Auth --> UC3[Ganti Password]
+    Auth --> UC4[Edit Profil]
+    Auth --> UC5[Lihat Notifikasi]
+    
+    Admin --> Patient[MANAJEMEN PASIEN]
+    Patient --> UC6[Registrasi Pasien Baru]
+    Patient --> UC7[Lihat Data Pasien]
+    Patient --> UC8[Edit Data Pasien]
+    Patient --> UC9[Hapus Data Pasien]
+    Patient --> UC10[Lihat Riwayat Medis]
+    Patient --> UC11[Export Data Pasien]
+    
+    Admin --> Queue[PENDAFTARAN & ANTRIAN]
+    Queue --> UC12[Daftar Kunjungan]
+    Queue --> UC13[Kelola Antrian]
+    Queue --> UC14[Panggil Antrian]
+    Queue --> UC15[Update Status Antrian]
+    Queue --> UC16[Cetak Kartu Antrian]
+    Queue --> UC17[Monitor Antrian]
+    
+    Admin --> Payment[PEMBAYARAN]
+    Payment --> UC49[Lihat Tagihan]
+    Payment --> UC50[Proses Pembayaran]
+    Payment --> UC51[Apply Diskon]
+    Payment --> UC52[Cetak Kuitansi]
+    Payment --> UC53[Kelola Cicilan]
+    
+    Admin --> Master[MASTER DATA]
+    Master --> UC54[Kelola Master Dokter]
+    Master --> UC55[Kelola Master Perawat]
+    Master --> UC56[Kelola Master Tindakan]
+    Master --> UC57[Kelola Master Ruangan]
+    Master --> UC58[Kelola Master Poli]
+    Master --> UC59[Kelola Master Diagnosis]
+    
+    Admin --> User[MANAJEMEN USER]
+    User --> UC60[Tambah User]
+    User --> UC61[Edit User]
+    User --> UC62[Hapus User]
+    User --> UC63[Reset Password]
+    User --> UC64[Kelola Role & Permission]
+    
+    Admin --> Report[LAPORAN]
+    Report --> UC65[Laporan Keuangan]
+    Report --> UC66[Laporan Kunjungan]
+    Report --> UC67[Laporan Pasien]
+    Report --> UC68[Laporan Apotek]
+    Report --> UC69[Laporan Kinerja]
+    Report --> UC70[Export Laporan]
+    
+    Admin --> Setting[PENGATURAN SISTEM]
+    Setting --> UC71[Pengaturan Umum]
+    Setting --> UC72[Pengaturan Tarif]
+    Setting --> UC73[Pengaturan Notifikasi]
+    Setting --> UC74[Backup Database]
+    Setting --> UC75[Restore Database]
+    Setting --> UC76[Activity Log]
+    
+    %% Styling
+    classDef actorStyle fill:#FFE5B4,stroke:#FF8C00,stroke-width:4px,font-size:16px
+    classDef moduleStyle fill:#E8F4F8,stroke:#2E86AB,stroke-width:3px,font-size:14px
+    classDef ucStyle fill:#E6F3FF,stroke:#4A90E2,stroke-width:2px
+    
+    class Admin actorStyle
+    class Auth,Patient,Queue,Payment,Master,User,Report,Setting moduleStyle
+    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13,UC14,UC15,UC16,UC17,UC49,UC50,UC51,UC52,UC53,UC54,UC55,UC56,UC57,UC58,UC59,UC60,UC61,UC62,UC63,UC64,UC65,UC66,UC67,UC68,UC69,UC70,UC71,UC72,UC73,UC74,UC75,UC76 ucStyle

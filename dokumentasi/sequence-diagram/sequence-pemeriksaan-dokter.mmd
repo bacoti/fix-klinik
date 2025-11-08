@@ -1,0 +1,105 @@
+sequenceDiagram
+    actor Doctor
+    participant QueuePage
+    participant ExaminationPage
+    participant ExaminationController
+    participant Database
+    participant PrescriptionController
+    participant MedicalRecordController
+    participant CompletePage
+
+    Doctor->>QueuePage: Lihat antrian pasien
+    QueuePage->>Database: GET patients with screening<br/>(no examination today)
+    Database-->>QueuePage: List of patients + screening data
+    QueuePage-->>Doctor: Tampilkan antrian pasien
+    
+    Doctor->>QueuePage: Pilih pasien untuk diperiksa
+    QueuePage->>ExaminationPage: Redirect ke form examination
+    
+    ExaminationPage->>Database: GET patient data
+    Database-->>ExaminationPage: Patient details
+    
+    ExaminationPage->>Database: GET latest screening
+    Database-->>ExaminationPage: Screening data (vital signs)
+    
+    ExaminationPage-->>Doctor: Tampilkan form examination<br/>dengan data pasien & screening
+    
+    Doctor->>ExaminationPage: Input anamnesis<br/>(riwayat penyakit)
+    Doctor->>ExaminationPage: Input physical examination<br/>(hasil pemeriksaan fisik)
+    Doctor->>ExaminationPage: Input diagnosis
+    
+    alt Butuh Resep Obat
+        Doctor->>ExaminationPage: Pilih obat dari database
+        ExaminationPage->>Database: GET medicines list
+        Database-->>ExaminationPage: Available medicines
+        ExaminationPage-->>Doctor: Tampilkan daftar obat
+        
+        loop Untuk setiap obat yang diresepkan
+            Doctor->>ExaminationPage: Pilih obat
+            Doctor->>ExaminationPage: Input quantity & instructions
+            ExaminationPage->>ExaminationPage: Add to prescription list
+        end
+        
+        Doctor->>ExaminationPage: Input prescription_text<br/>(resep dalam bentuk teks)
+    end
+    
+    alt Butuh Surat Sakit
+        Doctor->>ExaminationPage: Centang "Butuh surat sakit"
+        Doctor->>ExaminationPage: Input jumlah hari istirahat
+    end
+    
+    alt Butuh Follow-up
+        Doctor->>ExaminationPage: Input follow-up date
+    end
+    
+    Doctor->>ExaminationPage: Input additional notes
+    Doctor->>ExaminationPage: Submit examination
+    
+    ExaminationPage->>ExaminationController: POST /examinations
+    ExaminationController->>ExaminationController: Validasi data
+    
+    alt Validasi Berhasil
+        ExaminationController->>Database: Check existing examination today
+        
+        alt Belum Ada Examination Hari Ini
+            Database-->>ExaminationController: No examination today
+            
+            ExaminationController->>Database: INSERT examination data<br/>(patient_id, doctor_id,<br/>anamnesis, diagnosis, etc.)
+            Database-->>ExaminationController: Examination created (ID)
+            
+            alt Ada Resep Obat
+                loop Untuk setiap obat dalam resep
+                    ExaminationController->>PrescriptionController: Create prescription
+                    PrescriptionController->>Database: INSERT prescription<br/>(examination_id, medicine_id,<br/>quantity, instructions)
+                    Database-->>PrescriptionController: Prescription created
+                    PrescriptionController-->>ExaminationController: Success
+                end
+            end
+            
+            ExaminationController->>MedicalRecordController: Create medical record entry
+            MedicalRecordController->>Database: INSERT medical_records<br/>(activity_type: examination,<br/>details: JSON)
+            Database-->>MedicalRecordController: Record created
+            MedicalRecordController-->>ExaminationController: Success
+            
+            ExaminationController-->>ExaminationPage: Success message
+            
+            alt Ada Resep Obat
+                ExaminationPage->>CompletePage: Redirect dengan pesan<br/>"Pasien masuk ke antrian apotek"
+            else Tidak Ada Resep
+                ExaminationPage->>CompletePage: Redirect dengan pesan<br/>"Pemeriksaan selesai"
+            end
+            
+            CompletePage-->>Doctor: Tampilkan success message
+            
+        else Sudah Ada Examination Hari Ini
+            Database-->>ExaminationController: Examination exists today
+            ExaminationController-->>ExaminationPage: Error: Sudah diperiksa hari ini
+            ExaminationPage-->>Doctor: Tampilkan error message
+        end
+        
+    else Validasi Gagal
+        ExaminationController-->>ExaminationPage: Validation errors
+        ExaminationPage-->>Doctor: Tampilkan error messages
+    end
+    
+    Note over Doctor,CompletePage: Output:<br/>- Medical examination record<br/>- Prescription (jika ada)<br/>- Sick letter (jika ada)<br/>- Follow-up schedule (jika ada)

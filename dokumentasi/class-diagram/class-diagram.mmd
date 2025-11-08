@@ -1,0 +1,160 @@
+classDiagram
+    %% User Management
+    class User {
+        +int id
+        +string name
+        +string email
+        +string password
+        +string role
+        +timestamp email_verified_at
+        +string remember_token
+        +timestamps created_at, updated_at
+        +screeningsAsNurse() Screening[]
+        +examinationsAsDoctor() Examination[]
+        +prescriptionsAsPharmacist() Prescription[]
+    }
+
+    %% Patient Management
+    class Patient {
+        +int id
+        +string name
+        +string email
+        +string phone
+        +text address
+        +date date_of_birth
+        +enum gender
+        +boolean verified
+        +timestamps created_at, updated_at
+        +screenings() Screening[]
+        +latestScreening() Screening
+        +examinations() Examination[]
+        +medicalRecords() MedicalRecord[]
+        +getAgeAttribute() int
+        +getMedicalRecordNumberAttribute() string
+        +getRegistrationNumberAttribute() string
+        +getHasScreeningTodayAttribute() bool
+        +getHasExaminationTodayAttribute() bool
+        +getLatestScreeningAttribute() Screening
+    }
+
+    %% Screening (Pemeriksaan Awal)
+    class Screening {
+        +int id
+        +int patient_id
+        +int nurse_id
+        +decimal temperature
+        +int blood_pressure_systolic
+        +int blood_pressure_diastolic
+        +int heart_rate
+        +int respiratory_rate
+        +int oxygen_saturation
+        +decimal weight
+        +decimal height
+        +text complaints
+        +text notes
+        +timestamps created_at, updated_at
+        +patient() Patient
+        +nurse() User
+        +getBmiAttribute() decimal
+        +getBmiCategoryAttribute() string
+        +getBloodPressureAttribute() string
+    }
+
+    %% Examination (Pemeriksaan Dokter)
+    class Examination {
+        +int id
+        +int patient_id
+        +int doctor_id
+        +text anamnesis
+        +text physical_examination
+        +text diagnosis
+        +text prescription_text
+        +text additional_notes
+        +boolean sick_letter
+        +int sick_days
+        +date follow_up_date
+        +timestamps created_at, updated_at
+        +patient() Patient
+        +doctor() User
+        +prescriptions() Prescription[]
+    }
+
+    %% Medicine (Obat)
+    class Medicine {
+        +int id
+        +string name
+        +enum type
+        +string unit
+        +text description
+        +int stock
+        +decimal price
+        +datetime expired_at
+        +timestamps created_at, updated_at
+        +prescriptions() Prescription[]
+        +stockLogs() StockLog[]
+    }
+
+    %% Prescription (Resep)
+    class Prescription {
+        +int id
+        +int examination_id
+        +int medicine_id
+        +int quantity
+        +text instructions
+        +datetime dispensed_at
+        +int dispensed_by
+        +timestamps created_at, updated_at
+        +examination() Examination
+        +medicine() Medicine
+        +dispensedBy() User
+    }
+
+    %% Stock Log (Log Stok)
+    class StockLog {
+        +int id
+        +int medicine_id
+        +enum type
+        +int quantity
+        +text description
+        +timestamps created_at, updated_at
+        +medicine() Medicine
+    }
+
+    %% Medical Record (Rekam Medis)
+    class MedicalRecord {
+        +int id
+        +int patient_id
+        +enum activity_type
+        +json details
+        +datetime activity_date
+        +timestamps created_at, updated_at
+        +patient() Patient
+    }
+
+    %% Relationships
+    %% User relationships
+    User "1" --o "0..*" Screening : nurse_id
+    User "1" --o "0..*" Examination : doctor_id
+    User "1" --o "0..*" Prescription : dispensed_by
+
+    %% Patient relationships
+    Patient "1" --o "0..*" Screening : patient_id
+    Patient "1" --o "0..*" Examination : patient_id
+    Patient "1" --o "0..*" MedicalRecord : patient_id
+
+    %% Examination relationships
+    Examination "1" --o "0..*" Prescription : examination_id
+
+    %% Medicine relationships
+    Medicine "1" --o "0..*" Prescription : medicine_id
+    Medicine "1" --o "0..*" StockLog : medicine_id
+
+    %% Notes
+    note for User "Role: admin, nurse, doctor, pharmacist\nExtends: Authenticatable\nTraits: HasApiTokens, Notifiable"
+    note for Patient "Gender: male, female\nVerified: untuk validasi data"
+    note for Screening "Vital Signs + Anthropometry\nDilakukan oleh: Nurse"
+    note for Examination "Diagnosis & Treatment\nDilakukan oleh: Doctor"
+    note for Medicine "Type: tablet, capsule, syrup,\ninjection, cream, ointment"
+    note for Prescription "Tracks medicine dispensing"
+    note for StockLog "Type: in, out, adjustment"
+    note for MedicalRecord "Activity Type: registration,\nscreening, examination,\nprescription"

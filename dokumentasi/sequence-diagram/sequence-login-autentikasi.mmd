@@ -1,0 +1,38 @@
+sequenceDiagram
+    actor User
+    participant LoginPage
+    participant AuthController
+    participant Database
+    participant Dashboard
+
+    User->>LoginPage: Buka halaman login
+    LoginPage->>User: Tampilkan form login
+    
+    User->>LoginPage: Input email & password
+    LoginPage->>AuthController: POST /login
+    
+    AuthController->>Database: Validasi credentials
+    
+    alt Credentials Valid
+        Database-->>AuthController: User data found
+        AuthController->>AuthController: Verify password hash
+        
+        alt Password Match
+            AuthController->>Database: Create session
+            Database-->>AuthController: Session created
+            AuthController->>AuthController: Set authentication cookie
+            AuthController-->>LoginPage: Redirect to dashboard
+            LoginPage->>Dashboard: Load dashboard
+            Dashboard-->>User: Tampilkan dashboard sesuai role
+            
+            Note over Dashboard,User: Dashboard berbeda per role:<br/>- Admin: Full access<br/>- Nurse: Patient registration<br/>- Doctor: Examination queue<br/>- Pharmacist: Prescription queue
+        else Password Not Match
+            AuthController-->>LoginPage: Error: Invalid password
+            LoginPage-->>User: Tampilkan error message
+        end
+        
+    else Credentials Invalid
+        Database-->>AuthController: User not found
+        AuthController-->>LoginPage: Error: User not found
+        LoginPage-->>User: Tampilkan error message
+    end

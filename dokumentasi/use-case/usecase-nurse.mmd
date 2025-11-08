@@ -1,0 +1,49 @@
+%%{init: {'theme':'default'}}%%
+flowchart TD
+    Nurse((NURSE/PERAWAT))
+    
+    Nurse --> Auth[AUTENTIKASI & PROFIL]
+    Auth --> UC1[Login]
+    Auth --> UC2[Logout]
+    Auth --> UC3[Ganti Password]
+    Auth --> UC4[Edit Profil]
+    Auth --> UC5[Lihat Notifikasi]
+    
+    Nurse --> Patient[MANAJEMEN PASIEN]
+    Patient --> UC6[Registrasi Pasien Baru]
+    Patient --> UC7[Lihat Data Pasien]
+    Patient --> UC8[Edit Data Pasien]
+    Patient --> UC10[Lihat Riwayat Medis]
+    
+    Nurse --> Queue[PENDAFTARAN & ANTRIAN]
+    Queue --> UC12[Daftar Kunjungan]
+    Queue --> UC13[Kelola Antrian]
+    Queue --> UC14[Panggil Antrian]
+    Queue --> UC15[Update Status Antrian]
+    Queue --> UC16[Cetak Kartu Antrian]
+    Queue --> UC17[Monitor Antrian]
+    
+    Nurse --> Screening[PEMERIKSAAN AWAL]
+    Screening --> UC18[Input Vital Sign]
+    Screening --> UC19[Input Anamnesa Awal]
+    Screening --> UC20[Input Alergi]
+    Screening --> UC21[Upload Hasil Lab]
+    Screening --> UC22[Transfer ke Dokter]
+    
+    Nurse --> Action[TINDAKAN MEDIS]
+    Action --> UC26[Assist Tindakan Medis]
+    Action --> UC80[Kelola Ruangan]
+    Action --> UC81[Update Status Ruangan]
+    
+    Nurse --> Doc[DOKUMENTASI]
+    Doc --> UC82[Lihat Laporan Harian]
+    Doc --> UC83[Cetak Dokumen Pasien]
+    
+    %% Styling
+    classDef actorStyle fill:#FFE5B4,stroke:#FF8C00,stroke-width:4px,font-size:16px
+    classDef moduleStyle fill:#E8F4F8,stroke:#2E86AB,stroke-width:3px,font-size:14px
+    classDef ucStyle fill:#E6F3FF,stroke:#4A90E2,stroke-width:2px
+    
+    class Nurse actorStyle
+    class Auth,Patient,Queue,Screening,Action,Doc moduleStyle
+    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC10,UC12,UC13,UC14,UC15,UC16,UC17,UC18,UC19,UC20,UC21,UC22,UC26,UC80,UC81,UC82,UC83 ucStyle

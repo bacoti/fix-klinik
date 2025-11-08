@@ -1,0 +1,53 @@
+sequenceDiagram
+    actor Nurse
+    participant RegistrationPage
+    participant PatientController
+    participant Database
+    participant MedicalRecordController
+    participant SuccessPage
+
+    Nurse->>RegistrationPage: Buka halaman registrasi
+    RegistrationPage->>Nurse: Tampilkan form registrasi
+    
+    Nurse->>RegistrationPage: Input data pasien<br/>(nama, email, phone, address,<br/>date_of_birth, gender)
+    RegistrationPage->>RegistrationPage: Validasi form (client-side)
+    
+    alt Data Valid
+        RegistrationPage->>PatientController: POST /patients
+        PatientController->>PatientController: Validasi data (server-side)
+        
+        alt Validasi Berhasil
+            PatientController->>Database: Check email uniqueness
+            
+            alt Email Belum Terdaftar
+                Database-->>PatientController: Email available
+                PatientController->>Database: INSERT patient data
+                Database-->>PatientController: Patient created (ID)
+                
+                PatientController->>PatientController: Generate medical record number<br/>(MR + padded ID)
+                
+                PatientController->>MedicalRecordController: Create medical record entry
+                MedicalRecordController->>Database: INSERT medical_records<br/>(activity_type: registration)
+                Database-->>MedicalRecordController: Record created
+                MedicalRecordController-->>PatientController: Success
+                
+                PatientController-->>RegistrationPage: Success + Patient data<br/>(with medical record number)
+                RegistrationPage->>SuccessPage: Redirect dengan message
+                SuccessPage-->>Nurse: Tampilkan success message<br/>+ Medical Record Number
+                
+            else Email Sudah Terdaftar
+                Database-->>PatientController: Email exists
+                PatientController-->>RegistrationPage: Error: Email sudah terdaftar
+                RegistrationPage-->>Nurse: Tampilkan error message
+            end
+            
+        else Validasi Gagal
+            PatientController-->>RegistrationPage: Error: Validation failed
+            RegistrationPage-->>Nurse: Tampilkan error messages
+        end
+        
+    else Data Tidak Valid (Client-side)
+        RegistrationPage-->>Nurse: Tampilkan validation errors
+    end
+    
+    Note over Nurse,SuccessPage: Medical Record Number Format:<br/>MR + 6 digit (contoh: MR000001)
